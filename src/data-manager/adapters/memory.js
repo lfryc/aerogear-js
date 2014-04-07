@@ -83,7 +83,7 @@ AeroGear.DataManager.adapters.Memory = function( storeName, settings ) {
         @augments base
      */
     this.open = function( options ) {
-        return jQuery.Deferred().resolve( undefined, "success", options && options.success );
+        return Promise.resolve( undefined );
     };
 
     /**
@@ -154,18 +154,18 @@ dm.read( 12345 )
  */
 AeroGear.DataManager.adapters.Memory.prototype.read = function( id, options ) {
     var filter = {},
-        data,
-        deferred = jQuery.Deferred();
+        data;
 
     filter[ this.getRecordId() ] = id;
     if( id ) {
-        this.filter( filter ).then( function( filtered ) { data = filtered; } );
+        return this
+            .filter( filter )
+            .then(function( filtered ) {
+                return filtered; 
+            });
     } else {
-        data = this.getData();
+        return Promise.resolve( this.getData() );
     }
-
-    deferred.always( this.always );
-    return deferred.resolve( data, "success", options ? options.success : undefined );
 };
 
 /**
@@ -204,8 +204,7 @@ toUpdate.data.title = "Updated Task";
 dm.save( toUpdate );
  */
 AeroGear.DataManager.adapters.Memory.prototype.save = function( data, options ) {
-    var itemFound = false,
-        deferred = jQuery.Deferred();
+    var itemFound = false;
 
     data = Array.isArray( data ) ? data : [ data ];
 
@@ -231,8 +230,7 @@ AeroGear.DataManager.adapters.Memory.prototype.save = function( data, options ) 
             this.setData( data );
         }
     }
-    deferred.always( this.always );
-    return deferred.resolve( this.getData(), "success", options ? options.success : undefined );
+    return Promise.resolve( this.getData());
 };
 
 /**
@@ -275,15 +273,12 @@ dm.remove( undefined, {
 dm.remove();
  */
 AeroGear.DataManager.adapters.Memory.prototype.remove = function( toRemove, options ) {
-    var delId, data, item,
-        deferred = jQuery.Deferred();
-
-    deferred.always( this.always );
+    var delId, data, item;
 
     if ( !toRemove ) {
         // empty data array and return
         this.emptyData();
-        return deferred.resolve( this.getData(), "success", options ? options.success : undefined );
+        return Promise.resolve( this.getData() );
     } else {
         toRemove = Array.isArray( toRemove ) ? toRemove : [ toRemove ];
     }
@@ -306,7 +301,7 @@ AeroGear.DataManager.adapters.Memory.prototype.remove = function( toRemove, opti
         }
     }
 
-    return deferred.resolve( this.getData(), "success", options ? options.success : undefined );
+    return Promise.resolve( this.getData() );
 };
 
 /**
@@ -346,14 +341,11 @@ dm.stores.tasks.filter({
  */
 AeroGear.DataManager.adapters.Memory.prototype.filter = function( filterParameters, matchAny, options ) {
     var filtered, key, j, k, l, nestedKey, nestedFilter, nestedValue,
-        that = this,
-        deferred = jQuery.Deferred();
-
-    deferred.always( this.always );
+        that = this;
 
     if ( !filterParameters ) {
         filtered = this.getData() || [];
-        return deferred.resolve( filtered, "success", options ? options.success : undefined );
+        return Promise.resolve( filtered );
     }
 
     filtered = this.getData().filter( function( value, index, array) {
@@ -370,6 +362,7 @@ AeroGear.DataManager.adapters.Memory.prototype.filter = function( filterParamete
                 for ( j = 0; j < filterObj.data.length; j++ ) {
                     if( Array.isArray( value[ keys[ key ] ] ) ) {
                         if( value[ keys [ key ] ].length ) {
+                            debugger;
                             if( jQuery( value[ keys ] ).not( filterObj.data ).length === 0 && jQuery( filterObj.data ).not( value[ keys ] ).length === 0 ) {
                                 paramResult = true;
                                 break;
@@ -470,7 +463,7 @@ AeroGear.DataManager.adapters.Memory.prototype.filter = function( filterParamete
 
         return match;
     });
-    return deferred.resolve( filtered, "success", options ? options.success : undefined );
+    return Promise.resolve( filtered );
 };
 
 /**
