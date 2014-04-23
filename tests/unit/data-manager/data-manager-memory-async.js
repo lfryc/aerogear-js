@@ -676,6 +676,9 @@
                     matchAny: true
                 }
             })
+            .then(function( filtered ) {
+                equal( filtered.length, 3, "3 Items Matched" );
+            })
             .then(function() {
                 tasksStore.read().then( function( data ) {
                     equal( data.length, 4, "Original Data Unchanged" );

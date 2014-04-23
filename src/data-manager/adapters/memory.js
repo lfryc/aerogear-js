@@ -161,7 +161,7 @@ AeroGear.DataManager.adapters.Memory.prototype.read = function( id, options ) {
         return this
             .filter( filter )
             .then(function( filtered ) {
-                return filtered; 
+                return filtered;
             });
     } else {
         return Promise.resolve( this.getData() );
@@ -362,34 +362,25 @@ AeroGear.DataManager.adapters.Memory.prototype.filter = function( filterParamete
                 for ( j = 0; j < filterObj.data.length; j++ ) {
                     if( Array.isArray( value[ keys[ key ] ] ) ) {
                         if( value[ keys [ key ] ].length ) {
-                            debugger;
-                            if( jQuery( value[ keys ] ).not( filterObj.data ).length === 0 && jQuery( filterObj.data ).not( value[ keys ] ).length === 0 ) {
-                                paramResult = true;
-                                break;
-                            } else {
-                                for( k = 0; k < value[ keys[ key ] ].length; k++ ) {
-                                    if ( filterObj.matchAny && filterObj.data[ j ] === value[ keys[ key ] ][ k ] ) {
-                                        // At least one value must match and this one does so return true
-                                        paramResult = true;
-                                        if( matchAny ) {
-                                            break;
-                                        } else {
-                                            for( l = 0; l < value[ keys[ key ] ].length; l++ ) {
-                                                if( !matchAny && filterObj.data[ j ] !== value[ keys[ key ] ][ l ] ) {
-                                                    // All must match but this one doesn't so return false
-                                                    paramResult = false;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if ( !filterObj.matchAny && filterObj.data[ j ] !== value[ keys[ key ] ][ k ] ) {
-                                        // All must match but this one doesn't so return false
-                                        paramResult = false;
-                                        break;
-                                    }
-                                }
-                            }
+                              if ( matchAny || filterObj.matchAny ) {
+                                  for( k = 0; k < value[ keys[ key ] ].length; k++ ) {
+                                      if ( filterObj.data[ j ] === value[ keys[ key ] ][ k ] ) {
+                                          paramResult = true;
+                                          break;
+                                      }
+                                  }
+                              } else {
+                                  if ( value[ keys[ key ] ].length !== filterObj.data.length ) {
+                                      paramResult = false;
+                                  } else {
+                                      for( k = 0; k < value[ keys[ key ] ].length; k++ ) {
+                                          if ( filterObj.data[ k ] !== value[ keys[ key ] ][ k ] ) {
+                                              paramResult = false;
+                                              break;
+                                          }
+                                      }
+                                  }
+                              }
                         } else {
                             paramResult = false;
                         }
