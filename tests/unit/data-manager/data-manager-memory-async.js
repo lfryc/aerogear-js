@@ -651,22 +651,24 @@
         expect(2);
 
         tasksStore.filter({
-            tags: {
-                data: [ 111, 222 ],
-                matchAny: false
-            }
-        }).then( function( data ) { filtered = data; } );
-
-        tasksStore.read().then( function( data ) {
-            equal( data.length, 4, "Original Data Unchanged" );
-        });
-        equal( filtered.length, 1, "1 Item Matched" );
+                tags: {
+                    data: [ 111, 222 ],
+                    matchAny: false
+                }
+            })
+            .then( function( filtered ) {
+                equal( filtered.length, 1, "1 Item Matched" );
+            })
+            .then( function() {
+                tasksStore.read().then( function( data ) {
+                    equal( data.length, 4, "Original Data Unchanged" );
+                });
+            })
+            .then(start);
     });
 
     asyncTest( "filter single field Multiple Values, Array in Data, OR", function() {
         expect(2);
-
-        var filtered;
 
         tasksStore.filter({
                 tags: {
@@ -674,12 +676,12 @@
                     matchAny: true
                 }
             })
-            .then(function( data ) { filtered = data; } );
-
-        tasksStore.read().then( function( data ) {
-            equal( data.length, 4, "Original Data Unchanged" );
-        });
-
+            .then(function() {
+                tasksStore.read().then( function( data ) {
+                    equal( data.length, 4, "Original Data Unchanged" );
+                });
+            })
+            .then(start);
     });
 
     module( "Filter Data with Nested Objects",{
@@ -763,56 +765,58 @@
         }
     });
 
-    test( "filter data with nested objects", function() {
+    asyncTest( "filter data with nested objects", function() {
         expect(6);
 
         Promise.all([
-            tasksStore.filter({
-                        nested: { anotherNest: { "crazy.key": { val: 12345 } } }
-                })
-                .then(function( filtered ) {
-                    equal( filtered.length, 1, "Value only" );
-                }),
+                tasksStore.filter({
+                            nested: { anotherNest: { "crazy.key": { val: 12345 } } }
+                    })
+                    .then(function( filtered ) {
+                        equal( filtered.length, 1, "Value only" );
+                    }),
 
-            tasksStore.filter({
-                    nested: {
-                        data: [ { anotherNest: { "crazy.key": { val: 12345 } } } ]
-                    }
-                })
-                .then( function( filtered ) {
-                    equal( filtered.length, 1, "Value in array" );
-                }),
+                tasksStore.filter({
+                        nested: {
+                            data: [ { anotherNest: { "crazy.key": { val: 12345 } } } ]
+                        }
+                    })
+                    .then( function( filtered ) {
+                        equal( filtered.length, 1, "Value in array" );
+                    }),
 
-            tasksStore.filter({
-                    nested: {
-                        data: [ { anotherNest: { "crazy.key": { val: 12345 } } }, { someOtherNest: { "crazy.key": { val: 67890 } } } ],
-                        matchAny: true
-                    }
-                })
-                .then( function( filtered ) {
-                    equal( filtered.length, 3, "Single field - Multiple values" );
-                }),
+                tasksStore.filter({
+                        nested: {
+                            data: [ { anotherNest: { "crazy.key": { val: 12345 } } }, { someOtherNest: { "crazy.key": { val: 67890 } } } ],
+                            matchAny: true
+                        }
+                    })
+                    .then( function( filtered ) {
+                        equal( filtered.length, 3, "Single field - Multiple values" );
+                    }),
 
-            tasksStore.filter({
-                    nested: { someOtherNest: { "crazy.key": { val: 67890 } } },
-                    moreNesting: { hi: "there" }
-                })
-                .then( function( filtered ) {
-                    equal( filtered.length, 1, "Multiple fields - Single value - AND" );
-                }),
+                tasksStore.filter({
+                        nested: { someOtherNest: { "crazy.key": { val: 67890 } } },
+                        moreNesting: { hi: "there" }
+                    })
+                    .then( function( filtered ) {
+                        equal( filtered.length, 1, "Multiple fields - Single value - AND" );
+                    }),
 
-            tasksStore.filter({
-                    nested: { someOtherNest: { "crazy.key": { val: 67890 } } },
-                    moreNesting: { hi: "there" }
-                }, true)
-                .then( function( filtered ) {
-                    equal( filtered.length, 2, "Multiple fields - Single value - OR" );
-                })
+                tasksStore.filter({
+                        nested: { someOtherNest: { "crazy.key": { val: 67890 } } },
+                        moreNesting: { hi: "there" }
+                    }, true)
+                    .then( function( filtered ) {
+                        equal( filtered.length, 2, "Multiple fields - Single value - OR" );
+                    })
 
-        ]).then(function() {
-            return tasksStore.read().then( function( data ) {
-                equal( data.length, 7, "Original Data Unchanged" );
+            ])
+            .then(function() {
+                return tasksStore.read().then( function( data ) {
+                    equal( data.length, 7, "Original Data Unchanged" );
+                })
             })
-        }).then(start);
+            .then(start);
     });
 })();
