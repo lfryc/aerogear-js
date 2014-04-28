@@ -140,15 +140,12 @@ dm.save( toUpdate );
         value: function( data, options ) {
             // Call the super method
             var newData,
-                deferred = jQuery.Deferred(),
                 reset = options && options.reset ? options.reset : false,
                 oldData = window[ this.getStoreType() ].getItem( this.getStoreKey() );
 
             AeroGear.DataManager.adapters.Memory.prototype.save.apply( this, [ arguments[ 0 ], { reset: reset } ] ).then( function( data ) {
                 newData = data;
             });
-
-            deferred.always( this.always );
 
             // Sync changes to persistent store
             try {
@@ -164,14 +161,14 @@ dm.save( toUpdate );
                 });
 
                 if ( options && options.error ) {
-                    return deferred.reject( data, "error", options ? options.error : undefined );
+                    return Promise.reject( options.error );
                 } else {
-                    deferred.reject();
+                    Promise.reject();
                     throw error;
                 }
             }
 
-            return deferred.resolve( newData, "success", options ? options.success : undefined );
+            return Promise.resolve( newData );
         }, enumerable: true, configurable: true, writable: true
     },
     /**
@@ -218,8 +215,7 @@ dm.remove();
     remove: {
         value: function( toRemove, options ) {
             // Call the super method
-            var newData,
-                deferred = jQuery.Deferred();
+            var newData;
 
             AeroGear.DataManager.adapters.Memory.prototype.remove.apply( this, arguments ).then( function( data ) {
                 newData = data;
@@ -228,8 +224,7 @@ dm.remove();
             // Sync changes to persistent store
             window[ this.getStoreType() ].setItem( this.getStoreKey(), JSON.stringify( this.encrypt( newData ) ) );
 
-            deferred.always( this.always );
-            return deferred.resolve( newData, status, options ? options.success : undefined );
+            return Promise.resolve( newData );
         }, enumerable: true, configurable: true, writable: true
     }
 });
