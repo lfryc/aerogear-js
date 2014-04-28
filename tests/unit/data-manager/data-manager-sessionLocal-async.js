@@ -1,12 +1,16 @@
 (function() {
 
-    // Empty stores before starting tests
-    for ( var sessionItem in window.sessionStorage ) {
-        sessionStorage.removeItem( sessionItem );
-    }
-    for ( var localItem in window.localStorage ) {
-        localStorage.removeItem( localItem );
-    }
+    function emptyStores() {
+        // Empty stores before starting tests
+        for ( var sessionItem in window.sessionStorage ) {
+            sessionStorage.removeItem( sessionItem );
+        }
+        for ( var localItem in window.localStorage ) {
+            localStorage.removeItem( localItem );
+        }
+    };
+
+    emptyStores();
 
     module( "DataManager: SessionLocal" );
 
@@ -123,55 +127,63 @@
     });
 
     // Create a default (memory) dataManager to store data for some tests
-    var userStore = AeroGear.DataManager({
-            name: "users",
-            type: "SessionLocal",
-            settings: {
-                async: true
-            }
-        }).stores.users,
+    var userStore,
         userStoreReload;
 
     module( "DataManager: Memory - Data Manipulation",{
         setup: function() {
-            userStore.save([
-                {
-                    id: 12345,
-                    fname: "John",
-                    lname: "Smith",
-                    dept: "Accounting"
-                },
-                {
-                    id: 12346,
-                    fname: "Jane",
-                    lname: "Smith",
-                    dept: "IT"
-                },
-                {
-                    id: 12347,
-                    fname: "John",
-                    lname: "Doe",
-                    dept: "Marketing"
-                },
-                {
-                    id: 12348,
-                    fname: "Jane",
-                    lname: "Doe",
-                    dept: "Accounting"
-                },
-                {
-                    id: 12349,
-                    fname: "Any",
-                    lname: "Name",
-                    dept: "IT"
-                },
-                {
-                    id: 12350,
-                    fname: "Another",
-                    lname: "Person",
-                    dept: "Marketing"
+            // async setup
+            stop();
+
+            emptyStores();
+
+            userStore = AeroGear.DataManager({
+                name: "users",
+                type: "SessionLocal",
+                settings: {
+                    async: true
                 }
-            ], { reset: true } );
+            }).stores.users;
+
+            userStore.save([
+                    {
+                        id: 12345,
+                        fname: "John",
+                        lname: "Smith",
+                        dept: "Accounting"
+                    },
+                    {
+                        id: 12346,
+                        fname: "Jane",
+                        lname: "Smith",
+                        dept: "IT"
+                    },
+                    {
+                        id: 12347,
+                        fname: "John",
+                        lname: "Doe",
+                        dept: "Marketing"
+                    },
+                    {
+                        id: 12348,
+                        fname: "Jane",
+                        lname: "Doe",
+                        dept: "Accounting"
+                    },
+                    {
+                        id: 12349,
+                        fname: "Any",
+                        lname: "Name",
+                        dept: "IT"
+                    },
+                    {
+                        id: 12350,
+                        fname: "Another",
+                        lname: "Person",
+                        dept: "Marketing"
+                    }
+                ], { reset: true } )
+                .then( start );
         }
     });
 
@@ -561,50 +573,58 @@
     });
 
     // create a default(memory) dataManager to store data for some tests
-    var tasksStore = AeroGear.DataManager({
-            name: "tasks",
-            type: "SessionLocal",
-            settings: {
-                async: true
-            }
-        }).stores.tasks;
+    var tasksStore;
 
     module( "Filter - Advanced", {
         setup: function() {
-            tasksStore.save([
-                {
-                    id: 123,
-                    date: "2012-10-03",
-                    title: "Task 0-1",
-                    description: "Task 0-1 description Text",
-                    project: 99,
-                    tags: [ ]
-                },
-                {
-                    id: 12345,
-                    date: "2012-07-30",
-                    title: "Task 1-1",
-                    description: "Task 1-1 description text",
-                    project: 11,
-                    tags: [ 111 ]
-                },
-                {
-                    id: 67890,
-                    date: "2012-07-30",
-                    title: "Task 2-1",
-                    description: "Task 2-1 description text",
-                    project: 22,
-                    tags: [ 111, 222 ]
-                },
-                {
-                    id: 54321,
-                    date: "2012-07-30",
-                    title: "Task 3-1",
-                    description: "Task 3-1 description text",
-                    project: 33,
-                    tags: [ 222 ]
+            // async setup
+            stop();
+
+            emptyStores();
+
+            tasksStore = AeroGear.DataManager({
+                name: "tasks",
+                type: "SessionLocal",
+                settings: {
+                    async: true
                 }
-            ], { reset: true } );
+            }).stores.tasks;
+
+            tasksStore.save([
+                    {
+                        id: 123,
+                        date: "2012-10-03",
+                        title: "Task 0-1",
+                        description: "Task 0-1 description Text",
+                        project: 99,
+                        tags: [ ]
+                    },
+                    {
+                        id: 12345,
+                        date: "2012-07-30",
+                        title: "Task 1-1",
+                        description: "Task 1-1 description text",
+                        project: 11,
+                        tags: [ 111 ]
+                    },
+                    {
+                        id: 67890,
+                        date: "2012-07-30",
+                        title: "Task 2-1",
+                        description: "Task 2-1 description text",
+                        project: 22,
+                        tags: [ 111, 222 ]
+                    },
+                    {
+                        id: 54321,
+                        date: "2012-07-30",
+                        title: "Task 3-1",
+                        description: "Task 3-1 description text",
+                        project: 33,
+                        tags: [ 222 ]
+                    }
+                ], { reset: true } )
+                .then( start );
         }
     });
 
@@ -716,82 +736,96 @@
 
     module( "Filter Data with Nested Objects",{
         setup: function() {
+            // async setup
+            stop();
+
+            emptyStores();
+
+            tasksStore = AeroGear.DataManager({
+                name: "tasks",
+                type: "SessionLocal",
+                settings: {
+                    async: true
+                }
+            }).stores.tasks;
+
             tasksStore.save([
-                {
-                    id: 123,
-                    date: "2012-10-03",
-                    title: "Task 0-1",
-                    description: "Task 0-1 description Text",
-                    project: 99,
-                    tags: [ ]
-                },
-                {
-                    id: 12345,
-                    date: "2012-07-30",
-                    title: "Task 1-1",
-                    description: "Task 1-1 description text",
-                    project: 11,
-                    tags: [ 111 ]
-                },
-                {
-                    id: 67890,
-                    date: "2012-07-30",
-                    title: "Task 2-1",
-                    description: "Task 2-1 description text",
-                    project: 22,
-                    tags: [ 111, 222 ]
-                },
-                {
-                    id: 54321,
-                    date: "2012-07-30",
-                    title: "Task 3-1",
-                    description: "Task 3-1 description text",
-                    project: 33,
-                    tags: [ 222 ]
-                },
-                {
-                    id: 999999,
-                    date: "2012-07-30",
-                    title: "Task",
-                    description: "Task description text",
-                    nested: {
-                        anotherNest: {
-                            "crazy.key": {
-                                val: 12345
-                            }
-                        }
-                    }
-                },
-                {
-                    id: 999998,
-                    date: "2012-07-30",
-                    title: "Task",
-                    description: "Task description text",
-                    nested: {
-                        someOtherNest: {
-                            "crazy.key": {
-                                val: 67890
-                            }
-                        }
-                    }
-                },
-                {
-                    id: 999997,
-                    date: "2012-07-30",
-                    title: "Task",
-                    description: "Task description text",
-                    nested: {
-                        someOtherNest: {
-                            "crazy.key": {
-                                val: 67890
+                    {
+                        id: 123,
+                        date: "2012-10-03",
+                        title: "Task 0-1",
+                        description: "Task 0-1 description Text",
+                        project: 99,
+                        tags: [ ]
+                    },
+                    {
+                        id: 12345,
+                        date: "2012-07-30",
+                        title: "Task 1-1",
+                        description: "Task 1-1 description text",
+                        project: 11,
+                        tags: [ 111 ]
+                    },
+                    {
+                        id: 67890,
+                        date: "2012-07-30",
+                        title: "Task 2-1",
+                        description: "Task 2-1 description text",
+                        project: 22,
+                        tags: [ 111, 222 ]
+                    },
+                    {
+                        id: 54321,
+                        date: "2012-07-30",
+                        title: "Task 3-1",
+                        description: "Task 3-1 description text",
+                        project: 33,
+                        tags: [ 222 ]
+                    },
+                    {
+                        id: 999999,
+                        date: "2012-07-30",
+                        title: "Task",
+                        description: "Task description text",
+                        nested: {
+                            anotherNest: {
+                                "crazy.key": {
+                                    val: 12345
+                                }
                             }
                         }
                     },
-                    moreNesting: {
-                        hi: "there"
+                    {
+                        id: 999998,
+                        date: "2012-07-30",
+                        title: "Task",
+                        description: "Task description text",
+                        nested: {
+                            someOtherNest: {
+                                "crazy.key": {
+                                    val: 67890
+                                }
+                            }
+                        }
+                    },
+                    {
+                        id: 999997,
+                        date: "2012-07-30",
+                        title: "Task",
+                        description: "Task description text",
+                        nested: {
+                            someOtherNest: {
+                                "crazy.key": {
+                                    val: 67890
+                                }
+                            }
+                        },
+                        moreNesting: {
+                            hi: "there"
+                        }
                     }
-                }
-            ]);
+                ])
+                .then( start );
         }
     });
 
@@ -847,15 +881,30 @@
             .then( start );
     });
 
-    module( "DataManager: SessionLocal - Size Limits" );
+    module( "DataManager: SessionLocal - Size Limits", {
+        setup: function() {
 
-    // Empty stores before size tests
-    for ( sessionItem in window.sessionStorage ) {
-        sessionStorage.removeItem( sessionItem );
-    }
-    for ( localItem in window.localStorage ) {
-        localStorage.removeItem( localItem );
-    }
+            emptyStores();
+
+            sizeStores = AeroGear.DataManager([
+                {
+                    name: "size1",
+                    type: "SessionLocal",
+                    settings: {
+                        async: true
+                    }
+                },
+                {
+                    name: "size2",
+                    type: "SessionLocal",
+                    settings: {
+                        storageType: "localStorage",
+                        async: true
+                    }
+                }
+            ]);
+        }
+    } );
 
     // Create a session and a local store for testing data size limits
     var sizeErrorHandler = function( error, data ) {
@@ -864,47 +913,31 @@
         sizeSuccessHandler = function( data ) {
             ok( true, "Data Saved Successfully" );
         },
-        sizeStores = AeroGear.DataManager([
-        {
-            name: "size1",
-            type: "SessionLocal",
-            settings: {
-                async: true
-            }
-        },
-        {
-            name: "size2",
-            type: "SessionLocal",
-            settings: {
-                storageType: "localStorage",
-                async: true
-            }
-        }
-    ]);
+        sizeStores;
 
     asyncTest( "size limit - sessionStorage", function() {
         expect( 2 );
 
         var store = sizeStores.stores.size1,
             data1 = new Array( 1048576 ).join( "x" ),
-            data2 = new Array( 1048576 * 6 ).join( "x" ),
-            max = 12;
+            data2 = new Array( 1048576 * 6 ).join( "x" );
 
-        store.save({
-            id: "test",
-            val: data1
-        }, {
-            success: sizeSuccessHandler,
-            error: sizeErrorHandler
-        });
+        Promise.all([
+                store.save({
+                        id: "test",
+                        val: data1
+                    })
+                    .then( sizeSuccessHandler )
+                    .catch( sizeErrorHandler ),
 
-        store.save({
-            id: "test",
-            val: data2
-        }, {
-            success: sizeSuccessHandler,
-            error: sizeErrorHandler
-        });
+                store.save({
+                        id: "test",
+                        val: data2
+                    })
+                    .then( sizeSuccessHandler )
+                    .catch( sizeErrorHandler )
+            ])
+            .then( start );
     });
 
     asyncTest( "size limit - localStorage", function() {
@@ -912,23 +945,23 @@
 
         var store = sizeStores.stores.size2,
             data1 = new Array( 1048576 ).join( "x" ),
-            data2 = new Array( 1048576 * 6 ).join( "x" ),
-            max = 12;
+            data2 = new Array( 1048576 * 6 ).join( "x" );
 
-        store.save({
-            id: "test",
-            val: data1
-        }, {
-            success: sizeSuccessHandler,
-            error: sizeErrorHandler
-        });
+        Promise.all([
+                store.save({
+                    id: "test",
+                    val: data1
+                })
+                    .then( sizeSuccessHandler )
+                    .catch( sizeErrorHandler ),
 
-        store.save({
-            id: "test",
-            val: data2
-        }, {
-            success: sizeSuccessHandler,
-            error: sizeErrorHandler
-        });
+                store.save({
+                    id: "test",
+                    val: data2
+                })
+                    .then( sizeSuccessHandler )
+                    .catch( sizeErrorHandler )
+            ])
+            .then( start );
     });
 })();

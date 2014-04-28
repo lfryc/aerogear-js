@@ -57,11 +57,6 @@ AeroGear.DataManager.adapters.SessionLocal = function( storeName, settings ) {
         content = window[ storeType ].getItem( storeKey ),
         currentData = content ? this.decrypt( JSON.parse( content ), true ) : null ;
 
-    // Initialize data from the persistent store if it exists
-    if ( currentData ) {
-        AeroGear.DataManager.adapters.Memory.prototype.save.call( this, currentData, true );
-    }
-
     // Privileged Methods
     /**
         Returns the value of the private storeType var
@@ -82,6 +77,11 @@ AeroGear.DataManager.adapters.SessionLocal = function( storeName, settings ) {
     this.getStoreKey = function() {
         return storeKey;
     };
+
+    // Initialize data from the persistent store if it exists
+    if ( currentData ) {
+        AeroGear.DataManager.adapters.Memory.prototype.save.call( this, currentData, true );
+    }
 };
 
 /**
@@ -140,35 +140,32 @@ dm.save( toUpdate );
         value: function( data, options ) {
             // Call the super method
             var newData,
+                that = this,
                 reset = options && options.reset ? options.reset : false,
                 oldData = window[ this.getStoreType() ].getItem( this.getStoreKey() );
 
-            AeroGear.DataManager.adapters.Memory.prototype.save.apply( this, [ arguments[ 0 ], { reset: reset } ] ).then( function( data ) {
-                newData = data;
-            });
+            return AeroGear.DataManager.adapters.Memory.prototype.save.apply( this, [ arguments[ 0 ], { reset: reset } ] )
+                .then( function( newData ) {
+                    // Sync changes to persistent store
+                    try {
+                        window[ that.getStoreType() ].setItem( that.getStoreKey(), JSON.stringify( that.encrypt( newData ) ) );
+                        if ( options && options.success ) {
+                            options.storageSuccess( newData );
+                        }
+                    } catch( error ) {
+                        oldData = oldData ? JSON.parse( oldData ) : [];
 
-            // Sync changes to persistent store
-            try {
-                window[ this.getStoreType() ].setItem( this.getStoreKey(), JSON.stringify( this.encrypt( newData ) ) );
-                if ( options && options.success ) {
-                    options.storageSuccess( newData );
-                }
-            } catch( error ) {
-                oldData = oldData ? JSON.parse( oldData ) : [];
-
-                AeroGear.DataManager.adapters.Memory.prototype.save.apply( this, [ oldData, { reset: reset } ] ).then( function( data ) {
-                    newData = data;
+                        return AeroGear.DataManager.adapters.Memory.prototype.save.apply( that, [ oldData, { reset: reset } ] )
+                            .then( function( newData ) {
+                                if ( options && options.error ) {
+                                    return Promise.reject( options.error );
+                                } else {
+                                    return Promise.reject();
+                                }
+                            });
+                    }
+                    return newData;
                 });
-
-                if ( options && options.error ) {
-                    return Promise.reject( options.error );
-                } else {
-                    Promise.reject();
-                    throw error;
-                }
-            }
-
-            return Promise.resolve( newData );
         }, enumerable: true, configurable: true, writable: true
     },
     /**
@@ -214,17 +211,13 @@ dm.remove();
      */
     remove: {
         value: function( toRemove, options ) {
-            // Call the super method
-            var newData;
+            var that = this;
 
-            AeroGear.DataManager.adapters.Memory.prototype.remove.apply( this, arguments ).then( function( data ) {
-                newData = data;
-            });
-
-            // Sync changes to persistent store
-            window[ this.getStoreType() ].setItem( this.getStoreKey(), JSON.stringify( this.encrypt( newData ) ) );
-
-            return Promise.resolve( newData );
+            return AeroGear.DataManager.adapters.Memory.prototype.remove.apply( this, arguments )
+                .then( function( newData ) {
+                    // Sync changes to persistent store
+                    window[ that.getStoreType() ].setItem( that.getStoreKey(), JSON.stringify( that.encrypt( newData ) ) );
+                });
         }, enumerable: true, configurable: true, writable: true
     }
 });
