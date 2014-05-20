@@ -112,13 +112,13 @@ AeroGear.DataManager.adapters.WebSQL = function( storeName, settings ) {
                 // hasn't been opened yet
                 throw "Database not opened";
             } else {
-                this.open().always( function( value, status ) {
-                    if( status === "error" ) {
-                        throw "Database not opened";
-                    } else {
+                this.open()
+                    .then( function() {
                         callback.call( that, database );
-                    }
-                });
+                    })
+                    .catch( function() {
+                        throw "Database not opened";
+                    });
             }
         } else {
             callback.call( this, database );
@@ -158,32 +158,32 @@ AeroGear.DataManager.adapters.WebSQL.isValid = function() {
 AeroGear.DataManager.adapters.WebSQL.prototype.open = function( options ) {
     options = options || {};
 
-    var success, error, database,
+    var database,
         that = this,
         version = "1",
         databaseSize = 2 * 1024 * 1024,
         recordId = this.getRecordId(),
-        storeName = this.getStoreName(),
-        deferred = jQuery.Deferred();
+        storeName = this.getStoreName();
 
     // Do some creation and such
     database = window.openDatabase( storeName, version, "AeroGear WebSQL Store", databaseSize );
 
-    error = function( transaction, error ) {
-        deferred.reject( error, "error", options.error );
-    };
+    return new Promise( function( resolve, reject ) {
+        var success, error;
 
-    success = function( transaction, result ) {
-        that.setDatabase( database );
-        deferred.resolve( database, "success", options.success );
-    };
+        error = function( transaction, error ) {
+            reject( error );
+        };
 
-    database.transaction( function( transaction ) {
-        transaction.executeSql( "CREATE TABLE IF NOT EXISTS '" + storeName + "' ( " + recordId + " REAL UNIQUE, json)", [], success, error );
+        success = function( transaction, result ) {
+            that.setDatabase( database );
+            resolve( database );
+        };
+
+        database.transaction( function( transaction ) {
+            transaction.executeSql( "CREATE TABLE IF NOT EXISTS '" + storeName + "' ( " + recordId + " REAL UNIQUE, json)", [], success, error );
+        });
     });
-
-    deferred.always( this.always );
-    return deferred.promise();
 };
 
 /**
@@ -223,44 +223,42 @@ AeroGear.DataManager.adapters.WebSQL.prototype.open = function( options ) {
 AeroGear.DataManager.adapters.WebSQL.prototype.read = function( id, options ) {
     options = options || {};
 
-    var success, error, sql, _read,
+    var sql,
         that = this,
         data = [],
         params = [],
         storeName = this.getStoreName(),
         database = this.getDatabase(),
-        deferred = jQuery.Deferred(),
         i = 0;
 
-    _read = function( database ) {
-        error = function( transaction, error ) {
-            deferred.reject( error, "error", options.error );
-        };
+    return new Promise( function( resolve, reject ) {
+        that.run.call( that, function() {
+            var success, error;
 
-        success = function( transaction, result ) {
-            var rowLength = result.rows.length;
-            for( i; i < rowLength; i++ ) {
-                data.push( JSON.parse( result.rows.item( i ).json ) );
+            error = function( transaction, error ) {
+                reject( error );
+            };
+
+            success = function( transaction, result ) {
+                var rowLength = result.rows.length;
+                for( i; i < rowLength; i++ ) {
+                    data.push( JSON.parse( result.rows.item( i ).json ) );
+                }
+                resolve( that.decrypt( data ) );
+            };
+
+            sql = "SELECT * FROM '" + storeName + "'";
+
+            if( id ) {
+                sql += " WHERE ID = ?";
+                params = [ id ];
             }
-            deferred.resolve( that.decrypt( data ), "success", options.success );
-        };
 
-        sql = "SELECT * FROM '" + storeName + "'";
-
-        if( id ) {
-            sql += " WHERE ID = ?";
-            params = [ id ];
-        }
-
-        database.transaction( function( transaction ) {
-            transaction.executeSql( sql, params, success, error );
+            database.transaction( function( transaction ) {
+                transaction.executeSql( sql, params, success, error );
+            });
         });
-    };
-
-    this.run.call( this, _read );
-
-    deferred.always( this.always );
-    return deferred.promise();
+    });
 };
 
 /**
@@ -306,47 +304,44 @@ AeroGear.DataManager.adapters.WebSQL.prototype.read = function( id, options ) {
 AeroGear.DataManager.adapters.WebSQL.prototype.save = function( data, options ) {
     options = options || {};
 
-    var error, success, readSuccess, _save,
-        that = this,
+    var that = this,
         recordId = this.getRecordId(),
         database = this.getDatabase(),
         storeName = this.getStoreName(),
-        deferred = jQuery.Deferred(),
         i = 0;
 
-    _save = function( database ) {
-        error = function( transaction, error ) {
-            deferred.reject( error, "error", options.error );
-        };
+    return new Promise( function( resolve, reject ) {
+        that.run.call( that, function( database ) {
+            var error, success;
 
-        success = function( transaction, result ) {
-            that.read().done( function( result, status ) {
-                if( status === "success" ) {
-                    deferred.resolve( result, status, options.success );
-                } else {
-                    deferred.reject( result, status, options.error );
+            error = function( transaction, error ) {
+                reject( error );
+            };
+
+            success = function( transaction, result ) {
+                that.read()
+                    .then( function( result ) {
+                        resolve( result );
+                    })
+                    .catch( function( error ) {
+                        reject( error );
+                    });
+            };
+
+            data = Array.isArray( data ) ? data : [ data ];
+
+            database.transaction( function( transaction ) {
+                if( options.reset ) {
+                    transaction.executeSql( "DROP TABLE " + storeName );
+                    transaction.executeSql( "CREATE TABLE IF NOT EXISTS '" + storeName + "' ( " + recordId + " REAL UNIQUE, json)" );
                 }
-            });
-        };
-
-        data = Array.isArray( data ) ? data : [ data ];
-
-        database.transaction( function( transaction ) {
-            if( options.reset ) {
-                transaction.executeSql( "DROP TABLE " + storeName );
-                transaction.executeSql( "CREATE TABLE IF NOT EXISTS '" + storeName + "' ( " + recordId + " REAL UNIQUE, json)" );
-            }
-            data.forEach( function( value ) {
-                value = that.encrypt( value );
-                transaction.executeSql( "INSERT OR REPLACE INTO '" + storeName + "' ( id, json ) VALUES ( ?, ? ) ", [ value[ recordId ], JSON.stringify( value ) ] );
-            });
-        }, error, success );
-    };
-
-    this.run.call( this, _save );
-
-    deferred.always( this.always );
-    return deferred.promise();
+                data.forEach( function( value ) {
+                    value = that.encrypt( value );
+                    transaction.executeSql( "INSERT OR REPLACE INTO '" + storeName + "' ( id, json ) VALUES ( ?, ? ) ", [ value[ recordId ], JSON.stringify( value ) ] );
+                });
+            }, error, success );
+        });
+    });
 };
 
 /**
@@ -386,55 +381,52 @@ AeroGear.DataManager.adapters.WebSQL.prototype.save = function( data, options ) 
 AeroGear.DataManager.adapters.WebSQL.prototype.remove = function( toRemove, options ) {
     options = options || {};
 
-    var sql, success, error, _remove,
-        that = this,
+    var that = this,
         storeName = this.getStoreName(),
         database = this.getDatabase(),
-        deferred = jQuery.Deferred(),
         i = 0;
 
-    _remove = function( database ) {
-        error = function( transaction, error ) {
-            deferred.reject( error, "error", options.error );
-        };
+    return new Promise( function( resolve, reject ) {
+        that.run.call( that, function( database ) {
+            var sql, success, error;
 
-        success = function( transaction, result ) {
-            that.read().done( function( result, status ) {
-                if( status === "success" ) {
-                    deferred.resolve( result, status, options.success );
-                } else {
-                    deferred.reject( result, status, options.error );
-                }
-            });
-        };
+            error = function( transaction, error ) {
+                reject( error );
+            };
 
-        sql = "DELETE FROM '" + storeName + "'";
+            success = function( transaction, result ) {
+                that.read()
+                    .then( function( result ) {
+                        resolve( result );
+                    })
+                    .catch( function( error ) {
+                        reject( error );
+                    });
+            };
 
-        if( !toRemove ) {
-            // remove all
-            database.transaction( function( transaction ) {
-                transaction.executeSql( sql, [], success, error );
-            });
-        } else {
-            toRemove = Array.isArray( toRemove ) ? toRemove: [ toRemove ];
-            database.transaction( function( transaction ) {
-                for( i; i < toRemove.length; i++ ) {
-                    if ( typeof toRemove[ i ] === "string" || typeof toRemove[ i ] === "number" ) {
-                        transaction.executeSql( sql + " WHERE ID = ? ", [ toRemove[ i ] ] );
-                    } else if ( toRemove ) {
-                        transaction.executeSql( sql + " WHERE ID = ? ", [ toRemove[ i ][ this.getRecordId() ] ] );
-                    } else {
-                        continue;
+            sql = "DELETE FROM '" + storeName + "'";
+
+            if( !toRemove ) {
+                // remove all
+                database.transaction( function( transaction ) {
+                    transaction.executeSql( sql, [], success, error );
+                });
+            } else {
+                toRemove = Array.isArray( toRemove ) ? toRemove: [ toRemove ];
+                database.transaction( function( transaction ) {
+                    for( i; i < toRemove.length; i++ ) {
+                        if ( typeof toRemove[ i ] === "string" || typeof toRemove[ i ] === "number" ) {
+                            transaction.executeSql( sql + " WHERE ID = ? ", [ toRemove[ i ] ] );
+                        } else if ( toRemove ) {
+                            transaction.executeSql( sql + " WHERE ID = ? ", [ toRemove[ i ][ this.getRecordId() ] ] );
+                        } else {
+                            continue;
+                        }
                     }
-                }
-            }, error, success );
-        }
-    };
-
-    this.run.call( this, _remove );
-
-    deferred.always( this.always );
-    return deferred.promise();
+                }, error, success );
+            }
+        });
+    });
 };
 
 /**
@@ -467,29 +459,23 @@ AeroGear.DataManager.adapters.WebSQL.prototype.remove = function( toRemove, opti
 AeroGear.DataManager.adapters.WebSQL.prototype.filter = function( filterParameters, matchAny, options ) {
     options = options || {};
 
-    var _filter,
-        that = this,
-        deferred = jQuery.Deferred(),
+    var that = this,
         db = this.getDatabase();
 
-    _filter = function() {
-        this.read().then( function( data, status ) {
-        if( status !== "success" ) {
-                deferred.reject( data, status, options.error );
-                return;
-            }
-
-            AeroGear.DataManager.adapters.Memory.prototype.save.call( that, data, true );
-            AeroGear.DataManager.adapters.Memory.prototype.filter.call( that, filterParameters, matchAny ).then( function( data ) {
-                deferred.resolve( data, "success", options.success );
-            });
+    return new Promise( function( resolve, reject ) {
+        that.run.call( that, function() {
+            this.read()
+                .then( function( data ) {
+                    AeroGear.DataManager.adapters.Memory.prototype.save.call( that, data, true );
+                    AeroGear.DataManager.adapters.Memory.prototype.filter.call( that, filterParameters, matchAny ).then( function( data ) {
+                        resolve( data );
+                    });
+                })
+                .catch( function( error ) {
+                    reject( error );
+                });
         });
-    };
-
-    this.run.call( this, _filter );
-
-    deferred.always( this.always );
-    return deferred.promise();
+    });
 };
 
 /**
