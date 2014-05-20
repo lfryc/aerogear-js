@@ -112,13 +112,14 @@ AeroGear.DataManager.adapters.IndexedDB = function( storeName, settings ) {
                 // hasn't been opened yet
                 throw "Database not opened";
             } else {
-                this.open().always( function( value, status ) {
-                    if( status === "error" ) {
-                        throw "Database not opened";
-                    } else {
-                        fn.call( that, database );
-                    }
-                });
+                this.open()
+                    .then( function( value, status ) {
+                        if( status === "error" ) {
+                            throw "Database not opened";
+                        } else {
+                            fn.call( that, database );
+                        }
+                    });
             }
         } else {
             fn.call( this, database );
@@ -161,30 +162,28 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.open = function( options ) {
     var request, database,
         that = this,
         storeName = this.getStoreName(),
-        recordId = this.getRecordId(),
-        deferred = jQuery.Deferred();
+        recordId = this.getRecordId();
 
-    // Attempt to open the indexedDB database
-    request = window.indexedDB.open( storeName );
+    return new Promise( function( resolve, reject ) {
+        // Attempt to open the indexedDB database
+        request = window.indexedDB.open( storeName );
 
-    request.onsuccess = function( event ) {
-        database = event.target.result;
-        that.setDatabase( database );
-        deferred.resolve( database, "success", options.success );
-    };
+        request.onsuccess = function( event ) {
+            database = event.target.result;
+            that.setDatabase( database );
+            resolve( database );
+        };
 
-    request.onerror = function( event ) {
-        deferred.reject( event, "error", options.error );
-    };
+        request.onerror = function( event ) {
+            reject( event );
+        };
 
-    // Only called when the database doesn't exist and needs to be created
-    request.onupgradeneeded = function( event ) {
-        database = event.target.result;
-        database.createObjectStore( storeName, { keyPath: recordId } );
-    };
-
-    deferred.always( this.always );
-    return deferred.promise();
+        // Only called when the database doesn't exist and needs to be created
+        request.onupgradeneeded = function( event ) {
+            database = event.target.result;
+            database.createObjectStore( storeName, { keyPath: recordId } );
+        };
+    });
 };
 
 
@@ -224,54 +223,49 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.open = function( options ) {
 AeroGear.DataManager.adapters.IndexedDB.prototype.read = function( id, options ) {
     options = options || {};
 
-    var transaction, objectStore, cursor, request, _read,
+    var transaction, objectStore, cursor, request,
         that = this,
         data = [],
         database = this.getDatabase(),
-        storeName = this.getStoreName(),
-        deferred = jQuery.Deferred();
+        storeName = this.getStoreName();
 
-    _read = function( database ) {
+    return new Promise( function( resolve, reject ) {
+        that.run.call( that, function( database ) {
 
-        if( !database.objectStoreNames.contains( storeName ) ) {
-            deferred.resolve( [], "success", options.success );
-        }
+            if( !database.objectStoreNames.contains( storeName ) ) {
+                return resolve( [] );
+            }
 
-        transaction = database.transaction( storeName );
-        objectStore = transaction.objectStore( storeName );
+            transaction = database.transaction( storeName );
+            objectStore = transaction.objectStore( storeName );
 
-        if( id ) {
-            request = objectStore.get( id );
+            if( id ) {
+                request = objectStore.get( id );
 
-            request.onsuccess = function( event ) {
-                data.push( request.result );
+                request.onsuccess = function( event ) {
+                    data.push( request.result );
+                };
+
+            } else {
+                cursor = objectStore.openCursor();
+                cursor.onsuccess = function( event ) {
+                    var result = event.target.result;
+                    if( result ) {
+                        data.push( result.value );
+                        result.continue();
+                    }
+                };
+            }
+
+            transaction.oncomplete = function( event ) {
+                resolve( that.decrypt( data ));
             };
 
-        } else {
-            cursor = objectStore.openCursor();
-            cursor.onsuccess = function( event ) {
-                var result = event.target.result;
-                if( result ) {
-                    data.push( result.value );
-                    result.continue();
-                }
+            transaction.onerror = function( event ) {
+                reject( event );
             };
-        }
-
-        transaction.oncomplete = function( event ) {
-            deferred.resolve( that.decrypt( data ), "success", options.success );
-        };
-
-        transaction.onerror = function( event ) {
-            deferred.reject( event, "error", options.error );
-        };
-    };
-
-    this.run.call( this, _read );
-
-    deferred.always( this.always );
-
-    return deferred.promise();
+        });
+    });
 };
 
 /**
@@ -317,49 +311,44 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.read = function( id, options )
 AeroGear.DataManager.adapters.IndexedDB.prototype.save = function( data, options ) {
     options = options || {};
 
-    var transaction, objectStore, _save,
+    var transaction, objectStore,
         that = this,
         database = this.getDatabase(),
         storeName = this.getStoreName(),
-        deferred = jQuery.Deferred(),
         i = 0;
 
-    _save = function( database ) {
-        transaction = database.transaction( storeName, "readwrite" );
-        objectStore = transaction.objectStore( storeName );
+    return new Promise( function( resolve, reject ) {
+        that.run.call( that, function( database ) {
+            transaction = database.transaction( storeName, "readwrite" );
+            objectStore = transaction.objectStore( storeName );
 
-        if( options.reset ) {
-            objectStore.clear();
-        }
-
-        if( Array.isArray( data ) ) {
-            for( i; i < data.length; i++ ) {
-                objectStore.put( this.encrypt( data[ i ] ) );
+            if( options.reset ) {
+                objectStore.clear();
             }
-        } else {
-            objectStore.put( this.encrypt( data ) );
-        }
 
-        transaction.oncomplete = function( event ) {
-            that.read().done( function( data, status ) {
-                if( status === "success" ) {
-                    deferred.resolve( data, status, options.success );
-                } else {
-                    deferred.reject( data, status, options.error );
+            if( Array.isArray( data ) ) {
+                for( i; i < data.length; i++ ) {
+                    objectStore.put( this.encrypt( data[ i ] ) );
                 }
-            });
-        };
+            } else {
+                objectStore.put( this.encrypt( data ) );
+            }
 
-        transaction.onerror = function( event ) {
-            deferred.reject( event, "error", options.error );
-        };
-    };
+            transaction.oncomplete = function( event ) {
+                that.read()
+                    .then( function( data ) {
+                        resolve( data );
+                    })
+                    .catch( function() {
+                        reject( data, status );
+                    });
+            };
 
-    this.run.call( this, _save );
-
-    deferred.always( this.always );
-
-    return deferred.promise();
+            transaction.onerror = function( event ) {
+                reject( event );
+            };
+        });
+    });
 };
 
 /**
@@ -402,49 +391,44 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.remove = function( toRemove, o
         that = this,
         database = this.getDatabase(),
         storeName = this.getStoreName(),
-        deferred = jQuery.Deferred(),
         i = 0;
 
-    _remove = function() {
-        transaction = database.transaction( storeName, "readwrite" );
-        objectStore = transaction.objectStore( storeName );
+    return new Promise( function( resolve, reject) {
+        that.run.call( that, function() {
+            transaction = database.transaction( storeName, "readwrite" );
+            objectStore = transaction.objectStore( storeName );
 
-        if( !toRemove ) {
-            objectStore.clear();
-        } else  {
-            toRemove = Array.isArray( toRemove ) ? toRemove: [ toRemove ];
+            if( !toRemove ) {
+               objectStore.clear();
+            } else  {
+               toRemove = Array.isArray( toRemove ) ? toRemove: [ toRemove ];
 
-            for( i; i < toRemove.length; i++ ) {
-                if ( typeof toRemove[ i ] === "string" || typeof toRemove[ i ] === "number" ) {
-                    objectStore.delete( toRemove[ i ] );
-                } else if ( toRemove ) {
-                    objectStore.delete( toRemove[ i ][ this.getRecordId() ] );
-                } else {
-                    continue;
-                }
+               for( i; i < toRemove.length; i++ ) {
+                   if ( typeof toRemove[ i ] === "string" || typeof toRemove[ i ] === "number" ) {
+                       objectStore.delete( toRemove[ i ] );
+                   } else if ( toRemove ) {
+                       objectStore.delete( toRemove[ i ][ this.getRecordId() ] );
+                   } else {
+                       continue;
+                   }
+               }
             }
-        }
 
-        transaction.oncomplete = function( event ) {
-            that.read().done( function( data, status ) {
-                if( status === "success" ) {
-                    deferred.resolve( data, status, options.success );
-                } else {
-                    deferred.reject( data, status, options.error );
-                }
-            });
-        };
+            transaction.oncomplete = function( event ) {
+                that.read()
+                    .then( function( data ) {
+                        resolve( data );
+                    })
+                    .catch( function( error ) {
+                        reject( error );
+                    });
+            };
 
-        transaction.onerror = function( event ) {
-            deferred.reject( event, "error", options.error );
-        };
-    };
-
-    this.run.call( this, _remove );
-
-    deferred.always( this.always );
-
-    return deferred.promise();
+            transaction.onerror = function( event ) {
+               reject( event );
+            };
+        });
+    });
 };
 
 /**
@@ -479,27 +463,22 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.filter = function( filterParam
 
     var _filter,
         that = this,
-        deferred = jQuery.Deferred(),
         database = this.getDatabase();
 
-    _filter = function() {
-        this.read().then( function( data, status ) {
-            if( status !== "success" ) {
-                deferred.reject( data, status, options.error );
-                return;
-            }
-
-            AeroGear.DataManager.adapters.Memory.prototype.save.call( that, data, true );
-            AeroGear.DataManager.adapters.Memory.prototype.filter.call( that, filterParameters, matchAny ).then( function( data ) {
-                deferred.resolve( data, "success", options.success );
-            });
+    return new Promise( function( resolve, reject ) {
+        that.run.call( that, function() {
+            this.read()
+                .then( function( data ) {
+                    AeroGear.DataManager.adapters.Memory.prototype.save.call( that, data, true );
+                    AeroGear.DataManager.adapters.Memory.prototype.filter.call( that, filterParameters, matchAny ).then( function( data ) {
+                        resolve( data );
+                    });
+                })
+                .catch( function( error ) {
+                    reject( error );
+                });
         });
-    };
-
-    this.run.call( this, _filter );
-
-    deferred.always( this.always );
-    return deferred.promise();
+    });
 };
 
 /**

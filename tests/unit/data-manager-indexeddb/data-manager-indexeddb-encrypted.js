@@ -1,8 +1,4 @@
-function doAlways() {
-    start();
-}
-
-( function( $ ) {
+( function() {
 
     module( "DataManager: IndexedDB" );
 
@@ -25,9 +21,9 @@ function doAlways() {
             start();
         };
     });
-})( jQuery );
+})();
 
-( function( $ ) {
+( function() {
     var dm = AeroGear.DataManager();
 
     module( "DataManager: IndexedDB - Create and Test open failure", {
@@ -52,52 +48,48 @@ function doAlways() {
         equal( dm.stores.test1 instanceof AeroGear.DataManager.adapters.IndexedDB, true, "new Indexed DB instance created" );
     });
 
-    test( "Read - DB not open.  Should Fail", function() {
+    asyncTest( "Read - DB not open.  Should Fail", function() {
         expect( 1 );
 
-        raises( function() {
-                dm.stores.test1.read( undefined );
-            },
-            "Database not opened",
-            "throws"
-        );
+        dm.stores.test1.read( undefined )
+            .catch( function( error ) {
+                equal( error, "Database not opened", "error should be caught" );
+                start();
+            });
     });
 
-    test( "Save - DB not open.  Should Fail", function() {
+    asyncTest( "Save - DB not open.  Should Fail", function() {
         expect( 1 );
 
-        raises( function() {
-                dm.stores.test1.save( {} );
-            },
-            "Database not opened",
-            "throws"
-        );
+        dm.stores.test1.save( {} )
+            .catch( function( error ) {
+                equal( error, "Database not opened", "error should be caught" );
+                start();
+            });
     });
 
-    test( "Remove - DB not open.  Should Fail", function() {
+    asyncTest( "Remove - DB not open.  Should Fail", function() {
         expect( 1 );
 
-        raises( function() {
-                dm.stores.test1.remove( undefined );
-            },
-            "Database not opened",
-            "throws"
-        );
+        dm.stores.test1.remove( undefined )
+            .catch( function( error ) {
+                equal( error, "Database not opened", "error should be caught" );
+                start();
+            });
     });
 
-    test( "Filter - DB not open.  Should Fail", function() {
+    asyncTest( "Filter - DB not open.  Should Fail", function() {
         expect( 1 );
 
-        raises( function() {
-                dm.stores.test1.filter( { "name": "Lucas" }, true );
-            },
-            "Database not opened",
-            "throws"
-        );
+        dm.stores.test1.filter( { "name": "Lucas" }, true )
+            .catch( function( error ) {
+                equal( error, "Database not opened", "error should be caught" );
+                start();
+            });
     });
-})( jQuery );
+})();
 
-( function( $ ) {
+( function() {
     var dm = AeroGear.DataManager();
 
     module( "DataManager: IndexedDB - Open", {
@@ -136,38 +128,42 @@ function doAlways() {
     asyncTest( "Open", function() {
         expect( 4 );
 
-        dm.stores.test1.open({
-            success: function( data ) {
+        dm.stores.test1.open()
+            .then( function( data ) {
                 ok( true, "IndexedDB test1 created successfully" );
                 equal( data.name, "test1", "Store Name test1" );
                 equal( data.objectStoreNames.length, 1, "Object Store length should be 1" );
                 equal( data.objectStoreNames[ 0 ], "test1", "Object Store name should be test1" );
-            },
-            error: function( error ) {
+                start();
+            })
+            .catch( function( error ) {
                 ok( false, "error, IndexedDB create error" + error );
-            }
-        }).always( doAlways );
+                start();
+            });
     });
 
     asyncTest( "Open as a promise", function() {
         expect( 4 );
 
-        dm.stores.test1.open().then( function( data ) {
-            ok( true, "IndexedDB test1 created successfully" );
-            equal( data.name, "test1", "Store Name test1" );
-            equal( data.objectStoreNames.length, 1, "Object Store length should be 1" );
-            equal( data.objectStoreNames[ 0 ], "test1", "Object Store name should be test1" );
-        }).always( doAlways );
+        dm.stores.test1.open()
+            .then( function( data ) {
+                ok( true, "IndexedDB test1 created successfully" );
+                equal( data.name, "test1", "Store Name test1" );
+                equal( data.objectStoreNames.length, 1, "Object Store length should be 1" );
+                equal( data.objectStoreNames[ 0 ], "test1", "Object Store name should be test1" );
+            })
+            .then( start );
     });
-})( jQuery );
+})();
 
-(function( $ ) {
-    var hasopened,
-        dm = AeroGear.DataManager(),
+(function() {
+    var dm = AeroGear.DataManager(),
         data = null;
 
     module( "DataManager: IndexedDB - Save", {
         setup: function() {
+            stop();
+
             dm.add({
                 name: "test1",
                 type: "IndexedDB",
@@ -194,7 +190,8 @@ function doAlways() {
                 }
             ];
 
-            hasopened = dm.stores.test1.open();
+            dm.stores.test1.open()
+                .then( start );
         },
         teardown: function() {
             var deleteRequest,
@@ -203,7 +200,6 @@ function doAlways() {
             dm.stores.test1.close();
 
             dm.remove( "test1" );
-            hasopened = undefined;
 
             for( var db in dbs ) {
 
@@ -222,46 +218,44 @@ function doAlways() {
 
     asyncTest( "Save Data - Array", function() {
         expect( 3 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data, {
-                success: function( data ) {
-                    ok( true, "Data Saved Successfully" );
-                    equal( data.length, 2, "2 items in database" );
-                    equal( data[ 1 ].name, "Otter", "encrypted saved data is decrypted successfully" );
-                },
-                error: function( error ) {
-                    console.log( error );
-                    ok( false, "Failed to save records" + error );
-                }
-            }).always( doAlways );
-        });
+        dm.stores.test1.save( data )
+            .then( function( data ) {
+                ok( true, "Data Saved Successfully" );
+                equal( data.length, 2, "2 items in database" );
+                equal( data[ 1 ].name, "Otter", "encrypted saved data is decrypted successfully" );
+                start();
+            })
+            .catch( function( error ) {
+                console.log( error );
+                ok( false, "Failed to save records" + error );
+                start();
+            });
     });
 
     asyncTest( "Save Data - 1 Item", function() {
         expect( 3 );
-            hasopened.always( function() {
-                dm.stores.test1.save( { "id": 3, "name": "Grace", "type": "Little Person" }, {
-                success: function( data ) {
-                    ok( true, "Data Saved Successfully" );
-                    equal( data.length, 1, "1 items in database" );
-                    equal( data[ 0 ].name, "Grace", "encrypted saved data is decrypted successfully"  );
-                },
-                error: function( error ) {
-                    console.log( error );
-                    ok( false, "Failed to save records" + error );
-                }
-            }).always( doAlways );
-        });
+        dm.stores.test1.save( { "id": 3, "name": "Grace", "type": "Little Person" } )
+            .then( function( data ) {
+                ok( true, "Data Saved Successfully" );
+                equal( data.length, 1, "1 items in database" );
+                equal( data[ 0 ].name, "Grace", "encrypted saved data is decrypted successfully"  );
+                start();
+            })
+            .catch( function( error ) {
+                console.log( error );
+                ok( false, "Failed to save records" + error );
+                start();
+            });
     });
 
     asyncTest( "Save Data - Array - as a promise", function() {
         expect( 2 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).then( function( data ) {
+        dm.stores.test1.save( data )
+            .then( function( data ) {
                 ok( true, "Data Saved Successfully" );
                 equal( data.length, 2, "2 items in database" );
-            }).always( doAlways );
-        });
+                start();
+            });
     });
 
     asyncTest( "Save Data - Array - Reset - as a promise", function() {
@@ -279,26 +273,30 @@ function doAlways() {
                 }
             ];
 
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).then( function( data ) {
+        dm.stores.test1.save( data )
+            .then( function( data ) {
                 ok( true, "Data Saved Successfully" );
                 equal( data.length, 2, "2 items in database" );
-                dm.stores.test1.save( newData, { reset: true } ).then( function( data ) {
-                    ok( true, "Data Saved Successfully" );
-                    equal( data.length, 2, "2 items in database" );
-                }).always( doAlways );
+            })
+            .then( function() {
+                return dm.stores.test1.save( newData, { reset: true } );
+            })
+            .then( function( data ) {
+                ok( true, "Data Saved Successfully" );
+                equal( data.length, 2, "2 items in database" );
+                start();
             });
-        });
     });
-})( jQuery );
+})();
 
-(function( $ ) {
-    var hasopened,
-        dm = AeroGear.DataManager(),
+(function() {
+    var dm = AeroGear.DataManager(),
         data = null;
 
     module( "DataManager: IndexedDB - Read", {
         setup: function() {
+            stop();
+
             dm.add({
                 name: "test1",
                 type: "IndexedDB",
@@ -325,7 +323,8 @@ function doAlways() {
                 }
             ];
 
-            hasopened = dm.stores.test1.open();
+            dm.stores.test1.open()
+                .then( start );
         },
         teardown: function() {
             var deleteRequest,
@@ -353,58 +352,61 @@ function doAlways() {
 
     asyncTest( "Read Data - All", function() {
         expect( 2 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.read( undefined, {
-                    success: function( data ) {
-                        ok( true, "read all data successful" );
-                        equal( data.length, 2, "2 items returned" );
-                    },
-                    error: function( error ) {
-                        ok( false, "Read All has errors" + error );
-                    }
-                }).always( doAlways );
+
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.read( undefined );
+            })
+            .then( function( data ) {
+                ok( true, "read all data successful" );
+                equal( data.length, 2, "2 items returned" );
+                start();
+            })
+            .catch( function( error ) {
+                ok( false, "Read All has errors" + error );
+                start();
             });
-        });
     });
 
     asyncTest( "Read Data - 1 item - string", function() {
         expect( 2 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.read( 1, {
-                    success: function( data ) {
-                        ok( true, "read 1 item successful" );
-                        equal( data.length, 1, "1 items returned" );
-                    },
-                    error: function( error ) {
-                        ok( false, "Read 1 has errors" + error );
-                    }
-                }).always( doAlways );
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.read( 1 );
+            })
+            .then( function( data ) {
+                ok( true, "read 1 item successful" );
+                equal( data.length, 1, "1 items returned" );
+                start();
+            })
+            .catch( function( error ) {
+                ok( false, "Read 1 has errors" + error );
+                start();
             });
-        });
     });
 
     asyncTest( "Read Data - All - as a Promise", function() {
         expect( 2 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.read().then( function( data ) {
-                    ok( true, "read all data successful" );
-                    equal( data.length, 2, "2 items returned" );
-                }).always( doAlways );
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.read();
+            })
+            .then( function( data ) {
+                ok( true, "read all data successful" );
+                equal( data.length, 2, "2 items returned" );
+                start();
             });
-        });
     });
-})( jQuery );
+})();
 
-(function( $ ) {
-    var hasopened,
-        dm = AeroGear.DataManager(),
+(function() {
+    var dm = AeroGear.DataManager(),
         data = null;
 
     module( "DataManager: IndexedDB - Update", {
         setup: function() {
+            stop();
+
             dm.add({
                 name: "test1",
                 type: "IndexedDB",
@@ -431,7 +433,8 @@ function doAlways() {
                 }
             ];
 
-            hasopened = dm.stores.test1.open();
+            dm.stores.test1.open()
+                .then( start );
         },
         teardown: function() {
             var deleteRequest,
@@ -440,7 +443,6 @@ function doAlways() {
             dm.stores.test1.close();
 
             dm.remove( "test1" );
-            hasopened = undefined;
 
             for( var db in dbs ) {
 
@@ -459,43 +461,45 @@ function doAlways() {
 
     asyncTest( "Update Data - 1 item", function() {
         expect( 3 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.save( { "id": 1, "name": "Lucas", "type": "human" }, {
-                    success: function( data ) {
-                        ok( true, "update 1 item successful" );
-                        equal( data.length, 2, "2 items still returned" );
-                        equal( data[ 0 ].name, "Lucas", "Name field Updated"  );
-                    },
-                    error: function( error ) {
-                        ok( false, "update 1 has errors" + error );
-                    }
-                }).always( doAlways );
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.save( { "id": 1, "name": "Lucas", "type": "human" } );
+            })
+            .then( function( data ) {
+                ok( true, "update 1 item successful" );
+                equal( data.length, 2, "2 items still returned" );
+                equal( data[ 0 ].name, "Lucas", "Name field Updated"  );
+                start();
+            })
+            .catch( function( error ) {
+                ok( false, "update 1 has errors" + error );
+                start();
             });
-        });
     });
 
     asyncTest( "Update Data - 1 item - as a promise", function() {
         expect( 3 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.save( { "id": 1, "name": "Lucas", "type": "human" } ).then( function( data ) {
-                    ok( true, "update 1 item successful" );
-                    equal( data.length, 2, "2 items still returned" );
-                    equal( data[ 0 ].name, "Lucas", "Name field Updated"  );
-                }).always( doAlways );
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.save( { "id": 1, "name": "Lucas", "type": "human" } );
+            })
+            .then( function( data ) {
+                ok( true, "update 1 item successful" );
+                equal( data.length, 2, "2 items still returned" );
+                equal( data[ 0 ].name, "Lucas", "Name field Updated"  );
+                start();
             });
-        });
     });
-})( jQuery );
+})();
 
-(function( $ ) {
-    var hasopened,
-        dm = AeroGear.DataManager(),
+(function() {
+    var dm = AeroGear.DataManager(),
         data = null;
 
     module( "DataManager: IndexedDB - Remove", {
         setup: function() {
+            stop();
+
             dm.add({
                 name: "test1",
                 type: "IndexedDB",
@@ -522,7 +526,8 @@ function doAlways() {
                 }
             ];
 
-            hasopened = dm.stores.test1.open();
+            dm.stores.test1.open()
+                .then( start );
         },
         teardown: function() {
             var deleteRequest,
@@ -531,10 +536,8 @@ function doAlways() {
             dm.stores.test1.close();
 
             dm.remove( "test1" );
-            hasopened = undefined;
 
             for( var db in dbs ) {
-
                 deleteRequest = window.indexedDB.deleteDatabase( dbs[ db ] );
             }
 
@@ -550,58 +553,60 @@ function doAlways() {
 
     asyncTest( "Remove Data - 1 item - string", function() {
         expect( 2 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.remove( 1, {
-                    success: function( data ) {
-                        ok( true, "remove 1 item successful" );
-                        equal( data.length, 1, "1 items returned" );
-                    },
-                    error: function( error ) {
-                        ok( false, "remove 1 has errors" + error );
-                    }
-                }).always( doAlways );
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.remove( 1 );
+            })
+            .then( function( data ) {
+                ok( true, "remove 1 item successful" );
+                equal( data.length, 1, "1 items returned" );
+                start();
+            })
+            .catch( function( error ) {
+                ok( false, "remove 1 has errors" + error );
+                start();
             });
-        });
     });
 
     asyncTest( "Remove Data - All", function() {
         expect( 2 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.remove( undefined, {
-                    success: function( data ) {
-                        ok( true, "remove all items" );
-                        equal( data.length, 0, "0 items returned" );
-                    },
-                    error: function( error ) {
-                        ok( false, "remove all has errors" + error );
-                    }
-                }).always( doAlways );
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.remove( undefined );
+            })
+            .then( function( data ) {
+                ok( true, "remove all items" );
+                equal( data.length, 0, "0 items returned" );
+                start();
+            })
+            .catch( function( error ) {
+                ok( false, "remove all has errors" + error );
+                start();
             });
-        });
     });
 
     asyncTest( "Remove Data - All - as a promise", function() {
         expect( 2 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.remove().then( function( data ) {
-                    ok( true, "remove all items" );
-                    equal( data.length, 0, "0 items returned" );
-                }).always( doAlways );
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.remove();
+            })
+            .then( function( data ) {
+                ok( true, "remove all items" );
+                equal( data.length, 0, "0 items returned" );
+                start();
             });
-        });
     });
-})( jQuery );
+})();
 
-(function( $ ) {
-    var hasopened,
-        dm = AeroGear.DataManager(),
+(function() {
+    var dm = AeroGear.DataManager(),
         data = null;
 
     module( "DataManager: IndexedDB - Filter", {
         setup: function() {
+            stop();
+
             dm.add({
                 name: "test1",
                 type: "IndexedDB",
@@ -628,7 +633,8 @@ function doAlways() {
                 }
             ];
 
-            hasopened = dm.stores.test1.open();
+            dm.stores.test1.open()
+                .then( start );
         },
         teardown: function() {
             var deleteRequest,
@@ -637,7 +643,6 @@ function doAlways() {
             dm.stores.test1.close();
 
             dm.remove( "test1" );
-            hasopened = undefined;
 
             for( var db in dbs ) {
 
@@ -656,37 +661,38 @@ function doAlways() {
 
     asyncTest( "filter Data - 1 item", function() {
         expect( 3 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.filter( { "name": "Luke" }, true, {
-                    success: function( data ) {
-                        ok( true, "filter 1 item successfully" );
-                        equal( data.length, 1, "1 item returned" );
-                        equal( data[ 0 ].name, "Luke", "Name field returned"  );
-                    },
-                    error: function( error ) {
-                        ok( false, "update 1 has errors" + error );
-                    }
-                }).always( doAlways );
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.filter( { "name": "Luke" }, true);
+            })
+            .then( function( data ) {
+                ok( true, "filter 1 item successfully" );
+                equal( data.length, 1, "1 item returned" );
+                equal( data[ 0 ].name, "Luke", "Name field returned"  );
+                start();
+            })
+            .catch( function( error ) {
+                ok( false, "update 1 has errors" + error );
+                start();
             });
-        });
     });
 
     asyncTest( "filter Data - 1 item - as a promise", function() {
         expect( 3 );
-        hasopened.always( function() {
-            dm.stores.test1.save( data ).done( function() {
-                dm.stores.test1.filter( { "name": "Luke" }, true ).then( function( data ) {
-                    ok( true, "filter 1 item successfully" );
-                    equal( data.length, 1, "1 item returned" );
-                    equal( data[ 0 ].name, "Luke", "Name field returned"  );
-                }).always( doAlways );
+        dm.stores.test1.save( data )
+            .then( function() {
+                return dm.stores.test1.filter( { "name": "Luke" }, true );
+            })
+            .then( function( data ) {
+                ok( true, "filter 1 item successfully" );
+                equal( data.length, 1, "1 item returned" );
+                equal( data[ 0 ].name, "Luke", "Name field returned"  );
+                start();
             });
-        });
     });
-})( jQuery );
+})();
 
-( function( $ ) {
+( function() {
     var dm = AeroGear.DataManager();
     dm.add({
         name: "test1",
@@ -714,4 +720,4 @@ function doAlways() {
             start();
         };
     });
-})( jQuery );
+})();
