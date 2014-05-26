@@ -136,16 +136,6 @@
                 start();
             });
     });
-
-    asyncTest( "Open as a promise", function() {
-        expect( 1 );
-
-        dm.stores.test1.open()
-            .then( function( data ) {
-                ok( true, "WebSQL test1 created successfully" );
-                start();
-            });
-    });
 })();
 
 (function() {
@@ -229,18 +219,7 @@
             });
     });
 
-    asyncTest( "Save Data - Array - as a promise", function() {
-        expect( 2 );
-
-        dm.stores.test1.save( data )
-            .then( function( data ) {
-                ok( true, "Data Saved Successfully" );
-                equal( data.length, 2, "2 items in database" );
-                start();
-            });
-    });
-
-    asyncTest( "Save Data - Array - Reset - as a promise", function() {
+    asyncTest( "Save Data - Array - Reset", function() {
         expect( 4 );
         var newData = [
             {
@@ -353,19 +332,6 @@
                 ok( false, "Read 1 has errors" + error );
             });
     });
-
-    asyncTest( "Read Data - All - as a Promise", function() {
-        expect( 2 );
-        dm.stores.test1.save( data )
-            .then( function() {
-                return dm.stores.test1.read();
-            })
-            .then( function( data ) {
-                ok( true, "read all data successful" );
-                equal( data.length, 2, "2 items returned" );
-                start();
-            });
-    });
 })();
 
 (function() {
@@ -432,20 +398,6 @@
             })
             .catch( function( error ) {
                 ok( false, "update 1 has errors" + error );
-                start();
-            });
-    });
-
-    asyncTest( "Update Data - 1 item - as a promise", function() {
-        expect( 3 );
-        dm.stores.test1.save( data )
-            .then( function() {
-                return dm.stores.test1.save( { "id": 1, "name": "Lucas", "type": "human" } );
-            })
-            .then( function( data ) {
-                ok( true, "update 1 item successful" );
-                equal( data.length, 2, "2 items still returned" );
-                equal( data[ 1 ].name, "Lucas", "Name field Updated"  );
                 start();
             });
     });
@@ -534,19 +486,6 @@
                 start();
             });
     });
-
-    asyncTest( "Remove Data - All - as a promise", function() {
-        expect( 2 );
-        dm.stores.test1.save( data )
-            .then( function() {
-                return dm.stores.test1.remove();
-            })
-            .then( function( data ) {
-                ok( true, "remove all items" );
-                equal( data.length, 0, "0 items returned" );
-                start();
-            });
-    });
 })();
 
 (function() {
@@ -614,20 +553,6 @@
             .catch( function( error ) {
                 console.log( error.stack );
                 ok( false, "update 1 has errors: " + error );
-                start();
-            });
-    });
-
-    asyncTest( "filter Data - 1 item - as a promise", function() {
-        expect( 3 );
-        dm.stores.test1.save( data )
-            .then( function() {
-                return dm.stores.test1.filter( { "name": "Luke" }, true );
-            })
-            .then( function( data ) {
-                ok( true, "filter 1 item successfully" );
-                equal( data.length, 1, "1 item returned" );
-                equal( data[ 0 ].name, "Luke", "Name field returned"  );
                 start();
             });
     });
