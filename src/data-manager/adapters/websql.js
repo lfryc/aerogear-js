@@ -307,8 +307,7 @@ AeroGear.DataManager.adapters.WebSQL.prototype.save = function( data, options ) 
     var that = this,
         recordId = this.getRecordId(),
         database = this.getDatabase(),
-        storeName = this.getStoreName(),
-        i = 0;
+        storeName = this.getStoreName();
 
     return new Promise( function( resolve, reject ) {
         that.run.call( that, function( database ) {
@@ -383,12 +382,12 @@ AeroGear.DataManager.adapters.WebSQL.prototype.remove = function( toRemove, opti
 
     var that = this,
         storeName = this.getStoreName(),
-        database = this.getDatabase(),
-        i = 0;
+        database = this.getDatabase();
 
     return new Promise( function( resolve, reject ) {
         that.run.call( that, function( database ) {
-            var sql, success, error;
+            var sql, success, error,
+                i = 0;
 
             error = function( transaction, error ) {
                 reject( error );

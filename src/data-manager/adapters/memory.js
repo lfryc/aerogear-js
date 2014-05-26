@@ -230,7 +230,7 @@ AeroGear.DataManager.adapters.Memory.prototype.save = function( data, options ) 
             this.setData( data );
         }
     }
-    return Promise.resolve( this.getData());
+    return Promise.resolve( this.getData() );
 };
 
 /**
@@ -351,7 +351,7 @@ AeroGear.DataManager.adapters.Memory.prototype.filter = function( filterParamete
     filtered = this.getData().filter( function( value, index, array) {
         var match = matchAny ? false : true,
             keys = Object.keys( filterParameters ),
-            filterObj, paramMatch, paramResult;
+            filterObj, paramResult;
 
         for ( key = 0; key < keys.length; key++ ) {
             if ( filterParameters[ keys[ key ] ].data ) {

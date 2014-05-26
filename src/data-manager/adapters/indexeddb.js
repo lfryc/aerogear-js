@@ -53,7 +53,7 @@ AeroGear.DataManager.adapters.IndexedDB = function( storeName, settings ) {
     settings = settings || {};
 
     // Private Instance vars
-    var request, database,
+    var database,
         auto = settings.auto;
 
     // Privileged Methods
@@ -387,7 +387,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.save = function( data, options
 AeroGear.DataManager.adapters.IndexedDB.prototype.remove = function( toRemove, options ) {
     options = options || {};
 
-    var objectStore, transaction, _remove,
+    var objectStore, transaction,
         that = this,
         database = this.getDatabase(),
         storeName = this.getStoreName(),
@@ -461,8 +461,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.remove = function( toRemove, o
 AeroGear.DataManager.adapters.IndexedDB.prototype.filter = function( filterParameters, matchAny, options ) {
     options = options || {};
 
-    var _filter,
-        that = this,
+    var that = this,
         database = this.getDatabase();
 
     return new Promise( function( resolve, reject ) {
