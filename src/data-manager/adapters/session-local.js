@@ -57,6 +57,11 @@ AeroGear.DataManager.adapters.SessionLocal = function( storeName, settings ) {
         content = window[ storeType ].getItem( storeKey ),
         currentData = content ? this.decrypt( JSON.parse( content ), true ) : null ;
 
+    // Initialize data from the persistent store if it exists
+    if ( currentData ) {
+        AeroGear.DataManager.adapters.Memory.prototype.save.call( this, currentData, true );
+    }
+
     // Privileged Methods
     /**
         Returns the value of the private storeType var
@@ -77,11 +82,6 @@ AeroGear.DataManager.adapters.SessionLocal = function( storeName, settings ) {
     this.getStoreKey = function() {
         return storeKey;
     };
-
-    // Initialize data from the persistent store if it exists
-    if ( currentData ) {
-        AeroGear.DataManager.adapters.Memory.prototype.save.call( this, currentData, true );
-    }
 };
 
 /**
