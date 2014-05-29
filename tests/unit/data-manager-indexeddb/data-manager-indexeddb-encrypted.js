@@ -310,7 +310,6 @@
             dm.stores.test1.close();
 
             dm.remove( "test1" );
-            hasopened = undefined;
 
             for( var db in dbs ) {
 

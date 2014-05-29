@@ -131,7 +131,7 @@
             })
             .then( start )
             .catch( function() {
-                ok( false, "error, IndexedDB create error" + error );
+                ok( false, "error, IndexedDB create error" );
             });
     });
 })();

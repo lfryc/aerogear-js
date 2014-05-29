@@ -114,10 +114,10 @@
         teardown: function() {
             stop();
             dm.stores.test1.remove( undefined )
-                .then( function( data ) {
+                .then( function() {
                     start();
                 })
-                .catch( function( error ) {
+                .catch( function() {
                     start();
                 });
         }

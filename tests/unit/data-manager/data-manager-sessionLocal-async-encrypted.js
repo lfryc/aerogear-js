@@ -54,7 +54,7 @@
         dm.add({
             name: "addTest1",
             type: "SessionLocal"
-        }),
+        });
         dm.add({
             name: "addTest2",
             type: "SessionLocal"
@@ -138,7 +138,7 @@
 
             emptyStores();
 
-            agcrypto = AeroGear.Crypto()
+            agcrypto = AeroGear.Crypto();
 
             userStore = AeroGear.DataManager({
                 name: "users",
@@ -257,7 +257,7 @@
                     userStore.read( 12351 ).then( function( data ) {
                         equal( data.length, 1, "Read new item by id" );
                     })
-                ])
+                ]);
             })
             .then( start );
     });
@@ -321,7 +321,7 @@
                     userStore.read( 12351 ).then( function( data ) {
                         equal( data[ 0 ].fname, "Updated", "Check item is updated" );
                     })
-                ])
+                ]);
             })
             .then( start );
     });
@@ -399,7 +399,7 @@
                     userStore.read( 12354 ).then( function( data ) {
                         equal( data.length, 1, "Read new item by id" );
                     })
-                ])
+                ]);
             })
             .then( start );
     });
@@ -417,7 +417,7 @@
                     userStore.read( 12345 ).then( function( data ) {
                         equal( data.length, 0, "Removed item doesn't exist" );
                     })
-                ])
+                ]);
             })
             .then( start );
 
@@ -429,7 +429,7 @@
                 return userStore.remove([
                     12346,
                     data[ 0 ]
-                ])
+                ]);
             })
             .then( function() {
                 return Promise.all([
@@ -442,7 +442,7 @@
                     userStore.read( 12346 ).then( function( data ) {
                         equal( data.length, 0, "Removed item doesn't exist" );
                     })
-                ])
+                ]);
             })
             .then( start );
     });

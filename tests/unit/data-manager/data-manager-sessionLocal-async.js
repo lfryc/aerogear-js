@@ -8,7 +8,7 @@
         for ( var localItem in window.localStorage ) {
             localStorage.removeItem( localItem );
         }
-    };
+    }
 
     emptyStores();
 
@@ -53,7 +53,7 @@
         dm.add({
             name: "addTest1",
             type: "SessionLocal"
-        }),
+        });
         dm.add({
             name: "addTest2",
             type: "SessionLocal"
@@ -349,7 +349,7 @@
                     userStore.read( 12353 ).then( function( data ) {
                         equal( data[ 0 ].fname, "Updated", "Check item is updated" );
                     })
-                ])
+                ]);
             })
             .then( start );
     });
@@ -381,7 +381,7 @@
                     userStore.read( 12354 ).then( function( data ) {
                         equal( data.length, 1, "Read new item by id" );
                     })
-                ])
+                ]);
             })
             .then( start );
     });
@@ -429,7 +429,7 @@
                     userStore.read( 12346 ).then( function( data ) {
                         equal( data.length, 0, "Removed item doesn't exist" );
                     })
-                ])
+                ]);
             })
             .then( start );
     });

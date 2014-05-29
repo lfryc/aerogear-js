@@ -50,7 +50,7 @@
         expect( 5 );
 
         var dm = AeroGear.DataManager();
-        dm.add( "addTest1" ),
+        dm.add( "addTest1" );
         dm.add( "addTest2" );
 
         equal( Object.keys( dm.stores ).length, 2, "2 Stores added" );
@@ -175,7 +175,7 @@
             userStore.read( 12345 ).then( function( data ) {
                 equal( data.length, 1, "Read single item by id" );
             })
-        ]).then(start)
+        ]).then(start);
     });
 
     // Save data
@@ -230,7 +230,7 @@
                     userStore.read( 12353 ).then( function( data ) {
                         equal( data.length, 1, "Read new item by id" );
                     })
-                ])
+                ]);
             })
             .then(start);
 
@@ -306,7 +306,7 @@
                         lname: "Person3",
                         dept: "New"
                     }
-                ])
+                ]);
             })
             .then(function() {
                 return Promise.all([
@@ -349,7 +349,7 @@
                     userStore.read( 12354 ).then( function( data ) {
                         equal( data.length, 1, "Read new item by id" );
                     })
-                ])
+                ]);
             })
             .then(start);
     });
@@ -365,10 +365,10 @@
             .then(function() {
                 userStore.read().then( function( data ) {
                     equal( data.length, 5, "Read all data without removed item" );
-                }),
+                });
                 userStore.read( 12345 ).then( function( data ) {
                     equal( data.length, 0, "Removed item doesn't exist" );
-                })
+                });
             })
             .then(start);
 
@@ -398,7 +398,7 @@
                     userStore.read( 12346 ).then( function( data ) {
                         equal( data.length, 0, "Removed item doesn't exist" );
                     })
-                ])
+                ]);
             })
             .then(start);
     });
@@ -415,7 +415,7 @@
             .then(function() {
                 userStore.read().then( function( data ) {
                     equal( data.length, 6, "Original Data Unchanged" );
-                })
+                });
             })
             .then(start);
     });
@@ -489,7 +489,7 @@
             .then(function() {
                 return userStore.read().then( function( data ) {
                     equal( data.length, 6, "Original Data Unchanged" );
-                })
+                });
             })
             .then(start);
     });
@@ -606,7 +606,7 @@
             .then(function() {
                 return tasksStore.read().then( function( data ) {
                     equal( data.length, 4, "Original Data Unchanged" );
-                })
+                });
             })
             .then(start);
     });
@@ -818,7 +818,7 @@
             .then(function() {
                 return tasksStore.read().then( function( data ) {
                     equal( data.length, 7, "Original Data Unchanged" );
-                })
+                });
             })
             .then(start);
     });
