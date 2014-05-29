@@ -17,7 +17,7 @@
             deleteRequest = window.indexedDB.deleteDatabase( dbs[ db ] );
         }
 
-        deleteRequest.onsuccess = function( event ) {
+        deleteRequest.onsuccess = function() {
             start();
         };
     });
@@ -634,11 +634,11 @@
             deleteRequest = window.indexedDB.deleteDatabase( dbs[ db ] );
         }
 
-        deleteRequest.onsuccess = function( event ) {
+        deleteRequest.onsuccess = function() {
             start();
         };
 
-        deleteRequest.onerror = function( event ) {
+        deleteRequest.onerror = function() {
             start();
         };
     });

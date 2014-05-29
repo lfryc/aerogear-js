@@ -17,7 +17,7 @@
             deleteRequest = window.indexedDB.deleteDatabase( dbs[ db ] );
         }
 
-        deleteRequest.onsuccess = function( event ) {
+        deleteRequest.onsuccess = function() {
             start();
         };
     });
@@ -512,8 +512,7 @@
 })();
 
 (function() {
-    var hasopened,
-        dm = AeroGear.DataManager(),
+    var dm = AeroGear.DataManager(),
         data = null;
 
     module( "DataManager: IndexedDB - Update", {
@@ -762,11 +761,11 @@
             deleteRequest = window.indexedDB.deleteDatabase( dbs[ db ] );
         }
 
-        deleteRequest.onsuccess = function( event ) {
+        deleteRequest.onsuccess = function() {
             start();
         };
 
-        deleteRequest.onerror = function( event ) {
+        deleteRequest.onerror = function() {
             start();
         };
     });

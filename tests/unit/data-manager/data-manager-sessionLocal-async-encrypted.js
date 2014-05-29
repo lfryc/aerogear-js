@@ -933,10 +933,10 @@
     });
 
     // Create a session and a local store for testing data size limits
-    var sizeErrorHandler = function( error, data ) {
+    var sizeErrorHandler = function() {
             ok( true, "Error properly handled" );
         },
-        sizeSuccessHandler = function( data ) {
+        sizeSuccessHandler = function() {
             ok( true, "Data Saved Successfully" );
         },
         sizeStores;

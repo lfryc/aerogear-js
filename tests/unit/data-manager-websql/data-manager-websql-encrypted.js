@@ -127,7 +127,7 @@
         expect( 1 );
 
         dm.stores.test1.open()
-            .then( function( data ) {
+            .then( function() {
                 ok( true, "WebSQL test1 created successfully" );
                 start();
             })
@@ -177,12 +177,11 @@
         },
         teardown: function() {
             stop();
-            var dbs = [ "test1" ];
             dm.stores.test1.remove( undefined )
-                .then( function( data ) {
+                .then( function() {
                     start();
                 })
-                .catch( function( error ) {
+                .catch( function() {
                     start();
                 });
         }
@@ -289,12 +288,11 @@
         },
         teardown: function() {
             stop();
-            var dbs = [ "test1" ];
             dm.stores.test1.remove( undefined )
-                .then( function( data ) {
+                .then( function() {
                     start();
                 })
-                .catch( function( error ) {
+                .catch( function() {
                     start();
                 });
         }
@@ -373,12 +371,11 @@
         },
         teardown: function() {
             stop();
-            var dbs = [ "test1" ];
             dm.stores.test1.remove( undefined )
-                .then( function( data ) {
+                .then( function() {
                     start();
                 })
-                .catch( function( error ) {
+                .catch( function() {
                     start();
                 });
         }
@@ -442,12 +439,11 @@
         },
         teardown: function() {
             stop();
-            var dbs = [ "test1" ];
             dm.stores.test1.remove( undefined )
-                .then( function( data ) {
+                .then( function() {
                     start();
                 })
-                .catch( function( error ) {
+                .catch( function() {
                     start();
                 });
         }
@@ -527,12 +523,11 @@
         },
         teardown: function() {
             stop();
-            var dbs = [ "test1" ];
             dm.stores.test1.remove( undefined )
-                .then( function( data ) {
+                .then( function() {
                     start();
                 })
-                .catch( function( error ) {
+                .catch( function() {
                     start();
                 });
         }
@@ -582,12 +577,11 @@
 
     asyncTest( "end clean", function() {
         expect( 0 );
-        var dbs = [ "test1" ];
         dm.stores.test1.remove( undefined )
-            .then( function( data ) {
+            .then( function() {
                 start();
             })
-            .catch( function( error ) {
+            .catch( function() {
                 start();
             });
     });
