@@ -140,7 +140,7 @@ AeroGear.DataManager.adapters.IndexedDB.isValid = function() {
     @param {Object} [options={}] - options
     @param {AeroGear~successCallbackINDEXEDDB} [settings.success] - a callback to be called after successfully opening an IndexedDB
     @param {AeroGear~errorCallbackINDEXEDDB} [settings.error] - a callback to be called when there is an error with the opening of an IndexedDB
-    @return {Object} A jQuery.Deferred promise
+    @return {Object} A Promise
     @example
     // Create an empty DataManager
     var dm = AeroGear.DataManager();
@@ -193,7 +193,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.open = function( options ) {
     @param {Object} [options={}] - additional options
     @param {AeroGear~successCallbackINDEXEDDB} [options.success] - a callback to be called after the successful reading of an IndexedDB
     @param {AeroGear~errorCallbackINDEXEDDB} [options.error] - a callback to be called when there is an error reading an IndexedDB
-    @return {Object} A jQuery.Deferred promise
+    @return {Object} A Promise
     @example
     // Create an empty DataManager
     var dm = AeroGear.DataManager();
@@ -275,7 +275,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.read = function( id, options )
     @param {Boolean} [options.reset] - If true, this will empty the current data and set it to the data being saved
     @param {AeroGear~successCallbackINDEXEDDB} [options.success] - a callback to be called after the successful saving of a record into an IndexedDB
     @param {AeroGear~errorCallbackINDEXEDDB} [options.error] - a callback to be called when there is an error with the saving of a record into an IndexedDB
-    @return {Object} A jQuery.Deferred promise
+    @return {Object} A Promise
     @example
     // Create an empty DataManager
     var dm = AeroGear.DataManager();
@@ -356,7 +356,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.save = function( data, options
     @param {String|Object|Array} toRemove - A variety of objects can be passed to remove to specify the item or if nothing is provided, all data is removed
     @param {AeroGear~successCallbackINDEXEDDB} [options.success] - a callback to be called after successfully removing a record out of an IndexedDB
     @param {AeroGear~errorCallbackINDEXEDDB} [options.error] - a callback to be called when there is an error removing a record out of an IndexedDB
-    @return {Object} A jQuery.Deferred promise
+    @return {Object} A Promise
     @example
     // Create an empty DataManager
     var dm = AeroGear.DataManager();
@@ -437,7 +437,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.remove = function( toRemove, o
     @param {Boolean} [matchAny] - When true, an item is included in the output if any of the filter parameters is matched.
     @param {AeroGear~successCallbackINDEXEDDB} [options.success] - a callback to be called after successful filtering of an IndexedDB
     @param {AeroGear~errorCallbackINDEXEDDB} [options.error] - a callback to be called after an error filtering of an IndexedDB
-    @return {Object} A jQuery.Deferred promise
+    @return {Object} A Promise
     @example
     // Create an empty DataManager
     var dm = AeroGear.DataManager();

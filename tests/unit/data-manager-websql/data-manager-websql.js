@@ -143,9 +143,10 @@
             readPromise,
             filterPromise,
             savePromise,
-            deletePromise;
+            deletePromise,
+            closePromise;
 
-        expect( 5 );
+        expect( 6 );
 
         openPromise = store.open();
         ok( openPromise instanceof Promise, "open() returns promise" );
@@ -171,6 +172,11 @@
                 ok( deletePromise instanceof Promise, "remove() returns promise" );
 
                 return Promise.all( [ readPromise, deletePromise, filterPromise, savePromise ] );
+            })
+            .then( function() {
+                closePromise = store.close();
+                ok( closePromise instanceof Promise, "close() returns promise" );
+                return closePromise;
             })
             .then( start );
     });
