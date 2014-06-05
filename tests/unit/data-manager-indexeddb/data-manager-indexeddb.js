@@ -1,4 +1,4 @@
-( function( ) {
+( function() {
 
     module( "DataManager: IndexedDB" );
 
@@ -133,6 +133,86 @@
             .catch( function() {
                 ok( false, "error, IndexedDB create error" );
             });
+    });
+})();
+
+(function() {
+    var dm = AeroGear.DataManager(),
+        store;
+
+    module( "DataManager: IndexedDB - Promise API", {
+        setup: function() {
+            dm.add({
+                name: "test1",
+                type: "IndexedDB"
+            });
+
+            store = dm.stores.test1;
+        },
+        teardown: function() {
+            var deleteRequest,
+                dbs = [ "test1" ];
+
+            dm.stores.test1.close();
+
+            dm.remove( "test1" );
+
+            for( var db in dbs ) {
+
+                deleteRequest = window.indexedDB.deleteDatabase( dbs[ db ] );
+            }
+
+            deleteRequest.onsuccess = function( event ) {
+                console.log( event );
+            };
+
+            deleteRequest.onerror = function( event ) {
+                console.log( event );
+            };
+        }
+    });
+
+    asyncTest( "methods return Promises", function() {
+        var openPromise,
+            readPromise,
+            filterPromise,
+            savePromise,
+            deletePromise,
+            closePromise;
+
+        expect( 6 );
+
+        openPromise = store.open();
+        ok( openPromise instanceof Promise, "open() returns promise" );
+
+
+        openPromise
+            .then( function() {
+                readPromise = store.read();
+                ok( readPromise instanceof Promise, "read() returns promise" );
+
+                filterPromise = store.filter({});
+                ok( filterPromise instanceof Promise, "filter() returns promise" );
+
+                savePromise = store.save( {
+                    id: 12351,
+                    fname: "Joe",
+                    lname: "Doe",
+                    dept: "Vice President"
+                } );
+                ok( savePromise instanceof Promise, "save() returns promise" );
+
+                deletePromise = store.remove();
+                ok( deletePromise instanceof Promise, "remove() returns promise" );
+
+                return Promise.all( [ readPromise, deletePromise, filterPromise, savePromise ] );
+            })
+            .then( function() {
+                closePromise = store.close();
+                ok( closePromise instanceof Promise, "close() returns promise" );
+                return closePromise;
+            })
+            .then( start );
     });
 })();
 

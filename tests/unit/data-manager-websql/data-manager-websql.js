@@ -116,6 +116,68 @@
 
 (function() {
     var dm = AeroGear.DataManager(),
+        store;
+
+    module( "DataManager: WebSQL - Promise API", {
+        setup: function() {
+            dm.add({
+                name: "test1",
+                type: "WebSQL"
+            });
+            store = dm.stores.test1;
+        },
+        teardown: function() {
+            stop();
+            dm.stores.test1.remove( undefined )
+                .then( function() {
+                    start();
+                })
+                .catch( function() {
+                    start();
+                });
+        }
+    });
+
+    asyncTest( "methods return Promises", function() {
+        var openPromise,
+            readPromise,
+            filterPromise,
+            savePromise,
+            deletePromise;
+
+        expect( 5 );
+
+        openPromise = store.open();
+        ok( openPromise instanceof Promise, "open() returns promise" );
+
+
+        openPromise
+            .then( function() {
+                readPromise = store.read();
+                ok( readPromise instanceof Promise, "read() returns promise" );
+
+                filterPromise = store.filter({});
+                ok( filterPromise instanceof Promise, "filter() returns promise" );
+
+                savePromise = store.save( {
+                    id: 12351,
+                    fname: "Joe",
+                    lname: "Doe",
+                    dept: "Vice President"
+                } );
+                ok( savePromise instanceof Promise, "save() returns promise" );
+
+                deletePromise = store.remove();
+                ok( deletePromise instanceof Promise, "remove() returns promise" );
+
+                return Promise.all( [ readPromise, deletePromise, filterPromise, savePromise ] );
+            })
+            .then( start );
+    });
+})();
+
+(function() {
+    var dm = AeroGear.DataManager(),
         data = null;
 
     module( "DataManager: WebSQL - Save", {

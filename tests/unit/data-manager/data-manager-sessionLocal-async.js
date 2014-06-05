@@ -127,6 +127,89 @@
     });
 
     // Create a default (memory) dataManager to store data for some tests
+    var contactStore = AeroGear.DataManager( { name: "contacts", settings: { async: true } } ).stores.contacts;
+
+    module( "DataManager: Memory - Promise API",{
+        setup: function() {
+            // async setup
+            stop();
+
+            emptyStores();
+
+            contactStore = AeroGear.DataManager({
+                name: "contacts",
+                type: "SessionLocal",
+                settings: {
+                    async: true
+                }
+            }).stores.contacts;
+
+            contactStore.save([
+                {
+                    id: 12345,
+                    fname: "John",
+                    lname: "Smith",
+                    dept: "Accounting"
+                },
+                {
+                    id: 12346,
+                    fname: "Jane",
+                    lname: "Smith",
+                    dept: "IT"
+                },
+                {
+                    id: 12347,
+                    fname: "John",
+                    lname: "Doe",
+                    dept: "Marketing"
+                },
+                {
+                    id: 12348,
+                    fname: "Jane",
+                    lname: "Doe",
+                    dept: "Accounting"
+                },
+                {
+                    id: 12349,
+                    fname: "Any",
+                    lname: "Name",
+                    dept: "IT"
+                },
+                {
+                    id: 12350,
+                    fname: "Another",
+                    lname: "Person",
+                    dept: "Marketing"
+                }
+            ], { reset: true } )
+                .then( start );
+        }
+    });
+
+    asyncTest( "methods return promises", function() {
+        expect( 4 );
+
+        var readPromise = contactStore.read();
+        ok( readPromise instanceof Promise, "read() returns promise" );
+
+        var filterPromise = contactStore.filter({});
+        ok( filterPromise instanceof Promise, "filter() returns promise" );
+
+        var savePromise = contactStore.save( {
+            id: 12351,
+            fname: "Joe",
+            lname: "Doe",
+            dept: "Vice President"
+        } );
+        ok( savePromise instanceof Promise, "save() returns promise" );
+
+        var deletePromise = contactStore.remove();
+        ok( deletePromise instanceof Promise, "remove() returns promise" );
+
+        Promise.all( [ readPromise, deletePromise, filterPromise, savePromise ] ).then( start );
+    });
+
+    // Create a default (memory) dataManager to store data for some tests
     var userStore,
         userStoreReload;
 
