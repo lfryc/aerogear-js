@@ -136,9 +136,6 @@ AeroGear.DataManager.adapters.WebSQL.isValid = function() {
 
 /**
     Open the Database
-    @param {Object} [options={}] - options
-    @param {AeroGear~successCallbackWEBSQL} [settings.success] - a callback to be called when after successful opening of a WebSQL DB
-    @param {AeroGear~errorCallbackWEBSQL} [settings.error] - a callback to be called when there is an error opening a WebSQL DB
     @return {Object} A Promise
     @example
     // Create an empty DataManager
@@ -155,8 +152,7 @@ AeroGear.DataManager.adapters.WebSQL.isValid = function() {
         error: function() { ... }
     });
 */
-AeroGear.DataManager.adapters.WebSQL.prototype.open = function( options ) {
-    options = options || {};
+AeroGear.DataManager.adapters.WebSQL.prototype.open = function() {
 
     var database,
         that = this,
@@ -197,9 +193,6 @@ AeroGear.DataManager.adapters.WebSQL.prototype.close = function() {
 /**
     Read data from a store
     @param {String|Number} [id] - Usually a String or Number representing a single "record" in the data set or if no id is specified, all data is returned
-    @param {Object} [options={}] - additional options
-    @param {AeroGear~successCallbackWEBSQL} [options.success] - a callback to be called after successfully reading a WebSQL DB
-    @param {AeroGear~errorCallbackWEBSQL} [options.error] - a callback to be called when there is an error reading a WebSQL DB
     @return {Object} A Promise
     @example
     // Create an empty DataManager
@@ -228,8 +221,7 @@ AeroGear.DataManager.adapters.WebSQL.prototype.close = function() {
     });
 
  */
-AeroGear.DataManager.adapters.WebSQL.prototype.read = function( id, options ) {
-    options = options || {};
+AeroGear.DataManager.adapters.WebSQL.prototype.read = function( id ) {
 
     var that = this,
         data = [],
@@ -273,8 +265,6 @@ AeroGear.DataManager.adapters.WebSQL.prototype.read = function( id, options ) {
     @param {Object|Array} data - An object or array of objects representing the data to be saved to the server. When doing an update, one of the key/value pairs in the object to update must be the `recordId` you set during creation of the store representing the unique identifier for a "record" in the data set.
     @param {Object} [options={}] - additional options
     @param {Boolean} [options.reset] - If true, this will empty the current data and set it to the data being saved
-    @param {AeroGear~successCallbackWEBSQL} [options.success] - a callback to be called after successfully saving records to a WebSQL DB
-    @param {AeroGear~errorCallbackWEBSQL} [options.error] - a callback to be called when there is an error saving records to a WebSQL DB
     @return {Object} A Promise
     @example
     // Create an empty DataManager
@@ -352,8 +342,6 @@ AeroGear.DataManager.adapters.WebSQL.prototype.save = function( data, options ) 
 /**
     Removes data from the store
     @param {String|Object|Array} toRemove - A variety of objects can be passed to remove to specify the item or if nothing is provided, all data is removed
-    @param {AeroGear~successCallbackWEBSQL} [options.success] - a callback to be called after successfully removing a record from a WebSQL DB
-    @param {AeroGear~errorCallbackWEBSQL} [options.error] - a callback to be called when there is an error removing a record from a WebSQL DB
     @return {Object} A Promise
     @example
     // Create an empty DataManager
@@ -383,8 +371,7 @@ AeroGear.DataManager.adapters.WebSQL.prototype.save = function( data, options ) 
     });
 
  */
-AeroGear.DataManager.adapters.WebSQL.prototype.remove = function( toRemove, options ) {
-    options = options || {};
+AeroGear.DataManager.adapters.WebSQL.prototype.remove = function( toRemove ) {
 
     var that = this,
         storeName = this.getStoreName(),
@@ -437,8 +424,6 @@ AeroGear.DataManager.adapters.WebSQL.prototype.remove = function( toRemove, opti
     Filter the current store's data
     @param {Object} [filterParameters] - An object containing key/value pairs on which to filter the store's data. To filter a single parameter on multiple values, the value can be an object containing a data key with an Array of values to filter on and its own matchAny key that will override the global matchAny for that specific filter parameter.
     @param {Boolean} [matchAny] - When true, an item is included in the output if any of the filter parameters is matched.
-    @param {AeroGear~successCallbackWEBSQL} [options.success] - a callback to be called after a successful filtering of a WebSQL DB
-    @param {AeroGear~errorCallbackWEBSQL} [options.error] - a callback to be calledd after an error filtering a WebSQL DB
     @return {Object} A Promise
     @example
     // Create an empty DataManager
@@ -460,8 +445,7 @@ AeroGear.DataManager.adapters.WebSQL.prototype.remove = function( toRemove, opti
         error: function( error ) { ... }
     });
  */
-AeroGear.DataManager.adapters.WebSQL.prototype.filter = function( filterParameters, matchAny, options ) {
-    options = options || {};
+AeroGear.DataManager.adapters.WebSQL.prototype.filter = function( filterParameters, matchAny ) {
 
     var that = this;
 
