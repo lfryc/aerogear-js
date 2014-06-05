@@ -163,19 +163,18 @@ AeroGear.DataManager.adapters.WebSQL.prototype.open = function( options ) {
         version = "1",
         databaseSize = 2 * 1024 * 1024,
         recordId = this.getRecordId(),
-        storeName = this.getStoreName();
+        storeName = this.getStoreName(),
+        success, error;
 
     // Do some creation and such
     database = window.openDatabase( storeName, version, "AeroGear WebSQL Store", databaseSize );
 
     return new Promise( function( resolve, reject ) {
-        var success, error;
-
         error = function( transaction, error ) {
             reject( error );
         };
 
-        success = function( transaction, result ) {
+        success = function() {
             that.setDatabase( database );
             resolve( database );
         };
@@ -223,17 +222,16 @@ AeroGear.DataManager.adapters.WebSQL.prototype.open = function( options ) {
 AeroGear.DataManager.adapters.WebSQL.prototype.read = function( id, options ) {
     options = options || {};
 
-    var sql,
-        that = this,
+    var that = this,
         data = [],
         params = [],
         storeName = this.getStoreName(),
         database = this.getDatabase(),
+        sql, success, error,
         i = 0;
 
     return new Promise( function( resolve, reject ) {
         that.run.call( that, function() {
-            var success, error;
 
             error = function( transaction, error ) {
                 reject( error );
@@ -307,17 +305,17 @@ AeroGear.DataManager.adapters.WebSQL.prototype.save = function( data, options ) 
     var that = this,
         recordId = this.getRecordId(),
         database = this.getDatabase(),
-        storeName = this.getStoreName();
+        storeName = this.getStoreName(),
+        error, success;
 
     return new Promise( function( resolve, reject ) {
         that.run.call( that, function( database ) {
-            var error, success;
 
             error = function( transaction, error ) {
                 reject( error );
             };
 
-            success = function( transaction, result ) {
+            success = function() {
                 that.read()
                     .then( function( result ) {
                         resolve( result );
@@ -382,18 +380,18 @@ AeroGear.DataManager.adapters.WebSQL.prototype.remove = function( toRemove, opti
 
     var that = this,
         storeName = this.getStoreName(),
-        database = this.getDatabase();
+        database = this.getDatabase(),
+        sql, success, error,
+        i = 0;
 
     return new Promise( function( resolve, reject ) {
         that.run.call( that, function( database ) {
-            var sql, success, error,
-                i = 0;
 
             error = function( transaction, error ) {
                 reject( error );
             };
 
-            success = function( transaction, result ) {
+            success = function() {
                 that.read()
                     .then( function( result ) {
                         resolve( result );
