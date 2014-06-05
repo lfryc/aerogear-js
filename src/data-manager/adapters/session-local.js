@@ -139,8 +139,7 @@ dm.save( toUpdate );
     save: {
         value: function( data, options ) {
             // Call the super method
-            var newData,
-                that = this,
+            var that = this,
                 reset = options && options.reset ? options.reset : false,
                 oldData = window[ this.getStoreType() ].getItem( this.getStoreKey() );
 
@@ -156,7 +155,7 @@ dm.save( toUpdate );
                         oldData = oldData ? JSON.parse( oldData ) : [];
 
                         return AeroGear.DataManager.adapters.Memory.prototype.save.apply( that, [ oldData, { reset: reset } ] )
-                            .then( function( newData ) {
+                            .then( function() {
                                 if ( options && options.error ) {
                                     return Promise.reject( options.error );
                                 } else {

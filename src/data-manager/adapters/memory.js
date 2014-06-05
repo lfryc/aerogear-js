@@ -153,8 +153,7 @@ dm.read( 12345 )
     });
  */
 AeroGear.DataManager.adapters.Memory.prototype.read = function( id, options ) {
-    var filter = {},
-        data;
+    var filter = {};
 
     filter[ this.getRecordId() ] = id;
     if( id ) {
@@ -340,7 +339,7 @@ dm.stores.tasks.filter({
 );
  */
 AeroGear.DataManager.adapters.Memory.prototype.filter = function( filterParameters, matchAny, options ) {
-    var filtered, key, j, k, l, nestedKey, nestedFilter, nestedValue,
+    var filtered, key, j, k,
         that = this;
 
     if ( !filterParameters ) {
@@ -348,7 +347,7 @@ AeroGear.DataManager.adapters.Memory.prototype.filter = function( filterParamete
         return Promise.resolve( filtered );
     }
 
-    filtered = this.getData().filter( function( value, index, array) {
+    filtered = this.getData().filter( function( value ) {
         var match = matchAny ? false : true,
             keys = Object.keys( filterParameters ),
             filterObj, paramResult;

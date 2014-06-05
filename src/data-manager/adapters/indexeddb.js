@@ -242,7 +242,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.read = function( id, options )
             if( id ) {
                 request = objectStore.get( id );
 
-                request.onsuccess = function( event ) {
+                request.onsuccess = function() {
                     data.push( request.result );
                 };
 
@@ -257,7 +257,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.read = function( id, options )
                 };
             }
 
-            transaction.oncomplete = function( event ) {
+            transaction.oncomplete = function() {
                 resolve( that.decrypt( data ));
             };
 
@@ -313,7 +313,6 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.save = function( data, options
 
     var transaction, objectStore,
         that = this,
-        database = this.getDatabase(),
         storeName = this.getStoreName(),
         i = 0;
 
@@ -334,7 +333,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.save = function( data, options
                 objectStore.put( this.encrypt( data ) );
             }
 
-            transaction.oncomplete = function( event ) {
+            transaction.oncomplete = function() {
                 that.read()
                     .then( function( data ) {
                         resolve( data );
@@ -414,7 +413,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.remove = function( toRemove, o
                }
             }
 
-            transaction.oncomplete = function( event ) {
+            transaction.oncomplete = function() {
                 that.read()
                     .then( function( data ) {
                         resolve( data );
@@ -461,8 +460,7 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.remove = function( toRemove, o
 AeroGear.DataManager.adapters.IndexedDB.prototype.filter = function( filterParameters, matchAny, options ) {
     options = options || {};
 
-    var that = this,
-        database = this.getDatabase();
+    var that = this;
 
     return new Promise( function( resolve, reject ) {
         that.run.call( that, function() {
