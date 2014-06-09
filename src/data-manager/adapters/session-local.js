@@ -107,32 +107,42 @@ AeroGear.DataManager.adapters.SessionLocal.prototype = Object.create( new AeroGe
         @param {Boolean} [options.reset] - If true, this will empty the current data and set it to the data being saved
         @returns {Object} A Promise
         @example
-var dm = AeroGear.DataManager([{ name: "tasks", type: "SessionLocal" }]).stores[ 0 ];
+        var dm = AeroGear.DataManager([{ name: "tasks", type: "SessionLocal" }]).stores[ 0 ];
 
-// Store a new task
-dm.save({
-    title: "Created Task",
-    date: "2012-07-13",
-    ...
-});
+        dm.open()
+            .then( function() {
 
-// Store an array of new Tasks
-dm.save([
-    {
-        title: "Task2",
-        date: "2012-07-13"
-    },
-    {
-        title: "Task3",
-        date: "2012-07-13"
-        ...
-    }
-]);
+                // save one record
+                dm.save({
+                        title: "Created Task",
+                        date: "2012-07-13",
+                        ...
+                    })
+                    .then( function( newData ) { ... } )
+                    .catch( function( error ) { ... } );
 
-// Update an existing piece of data
-var toUpdate = dm.read()[ 0 ];
-toUpdate.data.title = "Updated Task";
-dm.save( toUpdate );
+                // save multiple records
+                dm.save([
+                        {
+                            title: "Task2",
+                            date: "2012-07-13"
+                        },
+                        {
+                            title: "Task3",
+                            date: "2012-07-13"
+                            ...
+                        }
+                    ])
+                    .then( function( newData ) { ... } )
+                    .catch( function( error ) { ... } );
+
+                // Update an existing piece of data
+                var toUpdate = dm.read()[ 0 ];
+                toUpdate.data.title = "Updated Task";
+                dm.save( toUpdate )
+                    .then( function( newData ) { ... } )
+                    .catch( function( error ) { ... } );
+            });
      */
     save: {
         value: function( data, options ) {
@@ -165,37 +175,26 @@ dm.save( toUpdate );
         @param {String|Object|Array} toRemove - A variety of objects can be passed to remove to specify the item or if nothing is provided, all data is removed
         @returns {Object} A Promise
         @example
-var dm = AeroGear.DataManager([{ name: "tasks", type: "SessionLocal" }]).stores[ 0 ];
+        var dm = AeroGear.DataManager([{ name: "tasks", type: "SessionLocal" }]).stores[ 0 ];
 
-// Store a new task
-dm.save({
-    title: "Created Task"
-});
+        dm.open()
+            .then( function() {
 
-// Store another new task
-dm.save({
-    title: "Another Created Task"
-});
+                // Delete a record
+                dm.remove( 1, )
+                    .then( function( newData ) { ... } )
+                    .catch( function( error ) { ... } );
 
-// Store one more new task
-dm.save({
-    title: "And Another Created Task"
-});
+                // Remove all data
+                dm.remove( undefined )
+                    .then( function( newData ) { ... } )
+                    .catch( function( error ) { ... } );
 
-// Delete a record
-dm.remove( 1, {
-    success: function( data ) { ... },
-    error: function( error ) { ... }
-});
-
-// Remove all data
-dm.remove( undefined, {
-    success: function( data ) { ... },
-    error: function( error ) { ... }
-});
-
-// Delete all remaining data from the store
-dm.remove();
+                // Delete all remaining data from the store
+                dm.remove()
+                    .then( function( newData ) { ... } )
+                    .catch( function( error ) { ... } );
+            });
      */
     remove: {
         value: function( toRemove ) {

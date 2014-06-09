@@ -136,19 +136,19 @@ AeroGear.DataManager.adapters.Memory.isValid = function() {
     @param {String|Number} [id] - Usually a String or Number representing a single "record" in the data set or if no id is specified, all data is returned
     @returns {Object} A Promise
     @example
-var dm = AeroGear.DataManager( "tasks" ).stores[ 0 ];
+    var dm = AeroGear.DataManager( "tasks" ).stores[ 0 ];
 
-// Get an array of all data in the store
-dm.read()
-    .then( function( data ) {
-        console.log( data );
-    });
+    // Get an array of all data in the store
+    dm.read()
+        .then( function( data ) {
+            console.log( data );
+        });
 
-// Read a specific piece of data based on an id
-dm.read( 12345 )
-    .then( function( data ) {
-        console.log( data );
-    });
+    // Read a specific piece of data based on an id
+    dm.read( 12345 )
+        .then( function( data ) {
+            console.log( data );
+        });
  */
 AeroGear.DataManager.adapters.Memory.prototype.read = function( id ) {
     var filter = {};
@@ -172,32 +172,42 @@ AeroGear.DataManager.adapters.Memory.prototype.read = function( id ) {
     @param {Boolean} [options.reset] - If true, this will empty the current data and set it to the data being saved
     @returns {Object} A Promise
     @example
-var dm = AeroGear.DataManager( "tasks" ).stores[ 0 ];
+    var dm = AeroGear.DataManager( "tasks" ).stores[ 0 ];
 
-// Store a new task
-dm.save({
-    title: "Created Task",
-    date: "2012-07-13",
-    ...
-});
+    dm.open()
+        .then( function() {
 
-// Store an array of new Tasks
-dm.save([
-    {
-        title: "Task2",
-        date: "2012-07-13"
-    },
-    {
-        title: "Task3",
-        date: "2012-07-13"
-        ...
-    }
-]);
+            // save one record
+            dm.save({
+                    title: "Created Task",
+                    date: "2012-07-13",
+                    ...
+                })
+                .then( function( newData ) { ... } )
+                .catch( function( error ) { ... } );
 
-// Update an existing piece of data
-var toUpdate = dm.read()[ 0 ];
-toUpdate.data.title = "Updated Task";
-dm.save( toUpdate );
+            // save multiple records
+            dm.save([
+                    {
+                        title: "Task2",
+                        date: "2012-07-13"
+                    },
+                    {
+                        title: "Task3",
+                        date: "2012-07-13"
+                        ...
+                    }
+                ])
+                .then( function( newData ) { ... } )
+                .catch( function( error ) { ... } );
+
+            // Update an existing piece of data
+            var toUpdate = dm.read()[ 0 ];
+            toUpdate.data.title = "Updated Task";
+            dm.save( toUpdate )
+                .then( function( newData ) { ... } )
+                .catch( function( error ) { ... } );
+        });
  */
 AeroGear.DataManager.adapters.Memory.prototype.save = function( data, options ) {
     var itemFound = false;
@@ -234,37 +244,26 @@ AeroGear.DataManager.adapters.Memory.prototype.save = function( data, options ) 
     @param {String|Object|Array} toRemove - A variety of objects can be passed to remove to specify the item or if nothing is provided, all data is removed
     @returns {Object} A Promise
     @example
-var dm = AeroGear.DataManager( "tasks" ).stores[ 0 ];
+    var dm = AeroGear.DataManager( "tasks" ).stores[ 0 ];
 
-// Store a new task
-dm.save({
-    title: "Created Task"
-});
+    dm.open()
+        .then( function() {
 
-// Store another new task
-dm.save({
-    title: "Another Created Task"
-});
+            // Delete a record
+            dm.remove( 1, )
+                .then( function( newData ) { ... } )
+                .catch( function( error ) { ... } );
 
-// Store one more new task
-dm.save({
-    title: "And Another Created Task"
-});
+            // Remove all data
+            dm.remove( undefined )
+                .then( function( newData ) { ... } )
+                .catch( function( error ) { ... } );
 
-// Delete a record
-dm.remove( 1, {
-    success: function( data ) { ... },
-    error: function( error ) { ... }
-});
-
-// Remove all data
-dm.remove( undefined, {
-    success: function( data ) { ... },
-    error: function( error ) { ... }
-});
-
-// Delete all remaining data from the store
-dm.remove();
+            // Delete all remaining data from the store
+            dm.remove()
+                .then( function( newData ) { ... } )
+                .catch( function( error ) { ... } );
+        });
  */
 AeroGear.DataManager.adapters.Memory.prototype.remove = function( toRemove ) {
     var delId, data, item;
@@ -304,32 +303,32 @@ AeroGear.DataManager.adapters.Memory.prototype.remove = function( toRemove ) {
     @param {Boolean} [matchAny] - When true, an item is included in the output if any of the filter parameters is matched.
     @return {Object} A Promise
     @example
-var dm = AeroGear.DataManager( "tasks" ).stores[ 0 ];
+    var dm = AeroGear.DataManager( "tasks" ).stores[ 0 ];
 
-// An object can be passed to filter the data
-// This would return all records with a user named 'admin' **AND** a date of '2012-08-01'
-dm.stores.tasks.filter({
-        date: "2012-08-01",
-        user: "admin"
-    },
-    {
-        success: function( data ) { ... },
-        error: function( error ) { ... }
-    }
-);
+    / Create an empty DataManager
+    var dm = AeroGear.DataManager();
 
-// The matchAny parameter changes the search to an OR operation
-// This would return all records with a user named 'admin' **OR** a date of '2012-08-01'
-dm.stores.tasks.filter({
-        date: "2012-08-01",
-        user: "admin"
-    },
-    true,
-    {
-        success: function( data ) { ... },
-        error: function( error ) { ... }
-    }
-);
+    dm.open()
+        .then( function() {
+
+            // An object can be passed to filter the data
+            // This would return all records with a user named 'admin' **AND** a date of '2012-08-01'
+            dm.filter( {
+                    date: "2012-08-01",
+                    user: "admin"
+                } )
+                .then( function( filteredData ) { ... } )
+                .catch( function( error ) { ... } );
+
+            // The matchAny parameter changes the search to an OR operation
+            // This would return all records with a user named 'admin' **OR** a date of '2012-08-01'
+            dm.filter( {
+                    date: "2012-08-01",
+                    user: "admin"
+                }, true )
+                .then( function( filteredData ) { ... } )
+                .catch( function( error ) { ... } );
+        });
  */
 AeroGear.DataManager.adapters.Memory.prototype.filter = function( filterParameters, matchAny ) {
     var filtered, key, j, k,
