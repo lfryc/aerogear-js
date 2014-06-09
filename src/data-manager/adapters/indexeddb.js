@@ -148,10 +148,9 @@ AeroGear.DataManager.adapters.IndexedDB.isValid = function() {
         type: "IndexedDB"
     });
 
-    dm.stores.newStore.open({
-        success: function() { ... },
-        error: function() { ... }
-    });
+    dm.stores.newStore.open()
+        .then(function() { ... })
+        .catch(function(error) { ... });
 */
 AeroGear.DataManager.adapters.IndexedDB.prototype.open = function() {
 
@@ -197,21 +196,19 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.open = function() {
         type: "IndexedDB"
     });
 
-    dm.stores.newStore.open({
-        success: function() { ... },
-        error: function() { ... }
-    });
+    dm.stores.newStore.open()
+        .then( function() {
 
-    dm.stores.test1.read( undefined, {
-        success: function( data ) { ... },
-        error: function( error ) { ... }
-    });
+            // read all records
+            dm.stores.test1.read( undefined )
+                .then( function( data ) { ... } )
+                .catch( function( error ) { ... } );
 
-    // read a record with a particular id
-    dm.stores.test1.read( 5, {
-        success: function( data ) { ... },
-        error: function( error ) { ... }
-    });
+            // read a record with a particular id
+            dm.stores.test1.read( 5 )
+                .then( function( data ) { ... } )
+                .catch( function( error ) { ... } );
+        });
  */
 AeroGear.DataManager.adapters.IndexedDB.prototype.read = function( id ) {
 
@@ -275,27 +272,22 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.read = function( id ) {
         type: "IndexedDB"
     });
 
-    dm.stores.newStore.open({
-        success: function() { ... },
-        error: function() { ... }
-    });
+    dm.stores.newStore.open()
+        .then( function() {
 
-    dm.stores.newStore.save( { "id": 3, "name": "Grace", "type": "Little Person" }, {
-        success: function( data ) { ... },
-        error: function( error ) { ... }
-    });
+            // save one record
+            dm.stores.newStore.save( { "id": 3, "name": "Grace", "type": "Little Person" })
+                .then( function( newData ) { ... } )
+                .catch( function( error ) { ... } );
 
-    // Save multiple Records
-    dm.stores.newStore.save(
-        [
-            { "id": 3, "name": "Grace", "type": "Little Person" },
-            { "id": 4, "name": "Graeham", "type": "Really Little Person" }
-        ],
-        {
-            success: function( data ) { ... },
-            error: function( error ) { ... }
-        }
-    );
+            // save multiple Records
+            dm.stores.newStore.save([
+                    { "id": 3, "name": "Grace", "type": "Little Person" },
+                    { "id": 4, "name": "Graeham", "type": "Really Little Person" }
+                ])
+                .then( function( newData ) { ... } )
+                .catch( function( error ) { ... } );
+        });
  */
 AeroGear.DataManager.adapters.IndexedDB.prototype.save = function( data, options ) {
     options = options || {};
@@ -324,8 +316,8 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.save = function( data, options
 
             transaction.oncomplete = function() {
                 that.read()
-                    .then( function( data ) {
-                        resolve( data );
+                    .then( function( newData ) {
+                        resolve( newData );
                     })
                     .catch( function() {
                         reject( data, status );
@@ -353,22 +345,19 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.save = function( data, options
         type: "IndexedDB"
     });
 
-    dm.stores.newStore.open({
-        success: function() { ... },
-        error: function() { ... }
-    });
+    dm.stores.newStore.open()
+        .then( function() {
 
-    // Delete a record
-    dm.stores.newStore.remove( 1, {
-        success: function( data ) { ... },
-        error: function( error ) { ... }
-    });
+        // remove one record
+        dm.stores.newStore.remove( 1 )
+            .then( function( newData ) { ... } )
+            .catch( function( error ) { ... } );
 
-    // Remove all data
-    dm.stores.newStore.remove( undefined, {
-        success: function( data ) { ... },
-        error: function( error ) { ... }
-    });
+        // save multiple Records
+        dm.stores.newStore.remove( undefined )
+            .then( function( newData ) { ... } )
+            .catch( function( error ) { ... } );
+      });
  */
 AeroGear.DataManager.adapters.IndexedDB.prototype.remove = function( toRemove ) {
 
@@ -401,8 +390,8 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.remove = function( toRemove ) 
 
             transaction.oncomplete = function() {
                 that.read()
-                    .then( function( data ) {
-                        resolve( data );
+                    .then( function( newData ) {
+                        resolve( newData );
                     })
                     .catch( function( error ) {
                         reject( error );
@@ -431,15 +420,14 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.remove = function( toRemove ) 
         type: "IndexedDB"
     });
 
-    dm.stores.newStore.open({
-        success: function() { ... },
-        error: function() { ... }
+    dm.stores.newStore.open()
+        .then( function() {
+
+        dm.stores.test1.filter( { "name": "Lucas" }, true )
+            .then( function( filteredData ) { ... } )
+            .catch( function( error ) { ... } );
     });
 
-    dm.stores.test1.filter( { "name": "Lucas" }, true, {
-        success: function( data ) { ... },
-        error: function( error ) { ... }
-    });
  */
 AeroGear.DataManager.adapters.IndexedDB.prototype.filter = function( filterParameters, matchAny ) {
 
@@ -450,8 +438,8 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.filter = function( filterParam
             this.read()
                 .then( function( data ) {
                     AeroGear.DataManager.adapters.Memory.prototype.save.call( that, data, true );
-                    AeroGear.DataManager.adapters.Memory.prototype.filter.call( that, filterParameters, matchAny ).then( function( data ) {
-                        resolve( data );
+                    AeroGear.DataManager.adapters.Memory.prototype.filter.call( that, filterParameters, matchAny ).then( function( filteredData ) {
+                        resolve( filteredData );
                     });
                 })
                 .catch( function( error ) {
