@@ -468,7 +468,6 @@ AeroGear.DataManager.adapters.IndexedDB.prototype.close = function() {
     if( database ) {
         database.close();
     }
-    return Promise.resolve();
 };
 
 /**

@@ -87,12 +87,11 @@ AeroGear.DataManager.adapters.Memory = function( storeName, settings ) {
     };
 
     /**
-        Returns a Promise that immediately resolves for api symmetry
+        This method is just for sake of API symmetry with other DataManagers. It immediately returns.
         @private
         @augments base
     */
     this.close = function() {
-        return Promise.resolve();
     };
 
     /**

@@ -178,7 +178,7 @@
             filterPromise,
             savePromise,
             deletePromise,
-            closePromise;
+            closeReturnValue;
 
         expect( 6 );
 
@@ -208,11 +208,10 @@
                 return Promise.all( [ readPromise, deletePromise, filterPromise, savePromise ] );
             })
             .then( function() {
-                closePromise = store.close();
-                ok( closePromise instanceof Promise, "close() returns promise" );
-                return closePromise;
-            })
-            .then( start );
+                closeReturnValue = store.close();
+                ok( closeReturnValue === undefined, "close() returns void" );
+                start();
+            });
     });
 })();
 

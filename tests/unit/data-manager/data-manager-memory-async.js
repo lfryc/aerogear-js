@@ -167,7 +167,7 @@
             filterPromise,
             savePromise,
             deletePromise,
-            closePromise;
+            closeReturnValue;
 
         expect( 6 );
 
@@ -197,11 +197,10 @@
                 return Promise.all( [ readPromise, deletePromise, filterPromise, savePromise ] );
             })
             .then( function() {
-                closePromise = contactStore.close();
-                ok( closePromise instanceof Promise, "close() returns promise" );
-                return closePromise;
-            })
-            .then( start );
+                closeReturnValue = contactStore.close();
+                ok( closeReturnValue === undefined, "close() returns void" );
+                start();
+            });
     });
 
     // Create a default (memory) dataManager to store data for some tests

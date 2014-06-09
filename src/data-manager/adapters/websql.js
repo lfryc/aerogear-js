@@ -181,12 +181,11 @@ AeroGear.DataManager.adapters.WebSQL.prototype.open = function() {
 };
 
 /**
- Returns a Promise that immediately resolves for api symmetry
+ This method is just for sake of API symmetry with other DataManagers. It immediately returns.
  @private
  @augments base
  */
 AeroGear.DataManager.adapters.WebSQL.prototype.close = function() {
-    return Promise.resolve();
 };
 
 /**
