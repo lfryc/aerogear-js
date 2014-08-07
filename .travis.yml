@@ -5,8 +5,6 @@ before_script:
   - npm install -g grunt-cli
 script:
   - grunt travis --verbose
-notifications:
-  irc: "irc.freenode.org#aerogear"
 branches:
   only:
     - master
