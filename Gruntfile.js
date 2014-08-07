@@ -169,6 +169,7 @@ module.exports = function(grunt) {
                 stdout: true,
                 stderr: true,
                 failOnError: true,
+                maxBuffer: Infinity,
                 callback: function(err, stdout, stderr, cb) {
                     try {
                         grunt.log.error(err);
