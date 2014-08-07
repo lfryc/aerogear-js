@@ -165,6 +165,18 @@ module.exports = function(grunt) {
             }
         },
         shell: {
+            options: {
+                stdout: true,
+                stderr: true,
+                failOnError: true,
+                callback: function(err, stdout, stderr, cb) {
+                    try {
+                        grunt.log.error(err);
+                    } finally {
+                        cb();
+                    }
+                }
+            },
             integrationSetup: {
                 command: [
                     'test -d aerogear-js-integration && rm -r aerogear-js-integration || true',
