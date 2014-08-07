@@ -165,10 +165,23 @@ module.exports = function(grunt) {
             }
         },
         shell: {
+            options: {
+                stdout: true,
+                stderr: true,
+                failOnError: true,
+                maxBuffer: Infinity,
+                callback: function(err, stdout, stderr, cb) {
+                    try {
+                        grunt.log.error(err);
+                    } finally {
+                        cb();
+                    }
+                }
+            },
             integrationSetup: {
                 command: [
                     'test -d aerogear-js-integration && rm -r aerogear-js-integration || true',
-                    'git clone https://github.com/aerogear/aerogear-js-integration.git',
+                    'git clone https://github.com/lfryc/aerogear-js-integration.git',
                     'cd aerogear-js-integration',
                     'cp ../dist/aerogear.js .',
                     'cp -rf ../node_modules node_modules'
@@ -304,7 +317,7 @@ module.exports = function(grunt) {
     grunt.registerTask('push', ['concat:push']);
     grunt.registerTask('crypto', ['concat:crypto']);
     grunt.registerTask('oauth2', ['concat:oauth2']);
-    grunt.registerTask('travis', ['jshint', 'qunit', 'concat:dist', 'shell:integrationSetup', 'shell:integrationVertxRunner', 'shell:integrationActiveMQRunner', 'shell:integrationSimplePushRunner']);
+    grunt.registerTask('travis', ['concat:dist', 'shell:integrationSetup', 'shell:integrationVertxRunner', 'shell:integrationActiveMQRunner', 'shell:integrationSimplePushRunner']);
     grunt.registerTask('docs',['shell:docs']);
 
     // A task to create custom builds of the library based on the 'concat' task
