@@ -1,10 +1,10 @@
-export var AeroGear = {};
+var AeroGear = {};
 
-AeroGear.isArray = function( obj ) {
+export function isArray( obj ) {
   return Array.isArray( obj );
 };
 
-AeroGear.extend = function() {
+export function extend() {
   var name, i, source,
     target = arguments[ 0 ];
   for( i=1; i<arguments.length; i++ ) {
@@ -15,8 +15,6 @@ AeroGear.extend = function() {
   }
   return target;
 };
-
-
 
 export class Core {
   constructor() {
@@ -45,7 +43,7 @@ export class Core {
           if( current.name ) {
 
             // Merge the Module( pipeline, datamanger, ... )config with the adapters settings
-            current.settings = AeroGear.extend( current.settings || {}, this.config );
+            current.settings = extend( current.settings || {}, this.config );
 
             collection[ current.name ] = AeroGear[ this.lib ].adapters[ current.type || this.type ]( current.name, current.settings );
           }
@@ -58,7 +56,7 @@ export class Core {
 
       // Merge the Module( pipeline, datamanger, ... )config with the adapters settings
       // config is an object so use that signature
-      config.settings = AeroGear.extend( config.settings || {}, this.config );
+      config.settings = extend( config.settings || {}, this.config );
 
       collection[ config.name ] = AeroGear[ this.lib ].adapters[ config.type || this.type ]( config.name, config.settings );
     }
@@ -98,8 +96,4 @@ export class Core {
 
     return this;
   };
-
-
 }
-
-AeroGear.Core = Core;
