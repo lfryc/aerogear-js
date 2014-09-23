@@ -1,3 +1,5 @@
+import { Core } from 'aerogear.core';
+
 /* AeroGear JavaScript Library
 * https://github.com/aerogear/aerogear-js
 * JBoss, Home of Professional Open Source
@@ -26,14 +28,10 @@
     // Create an empty authorizer
     var authz = AeroGear.Authorization();
  */
-AeroGear.Authorization = function( config ) {
-    // Allow instantiation without using new
-    if ( !( this instanceof AeroGear.Authorization ) ) {
-        return new AeroGear.Authorization( config );
-    }
+export class Authorization extends Core {
 
-    // Super constructor
-    AeroGear.Core.call( this );
+    constructor() {
+    }
 
     this.lib = "Authorization";
     this.type = config ? config.type || "OAuth2" : "OAuth2";
