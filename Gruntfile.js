@@ -23,6 +23,9 @@ module.exports = function (grunt) {
                     'dist/aerogear.core.concat.js': ['node_modules/grunt-microlib/assets/loader.js', 'dist/aerogear.core.micro.js']
                 }
             }
+        },
+        'multi-stage-sourcemap': {
+            core: {}
         }
     });
 

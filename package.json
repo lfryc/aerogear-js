@@ -96,6 +96,7 @@
     "gulp-es6-transpiler": "^1.0.0",
     "jsdoc-aerogear": "~3.2.0-dev",
     "lodash": "~2.4.1",
+    "multi-stage-sourcemap": "^0.2.1",
     "request": "~2.27.0",
     "source-map": "^0.1.39"
   },
