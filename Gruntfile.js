@@ -16,15 +16,23 @@ module.exports = function (grunt) {
         },
         microlibMap: {
             core: {}
+        },
+        concat_sourcemap: {
+            core: {
+                files: {
+                    'dist/aerogear.core.concat.js': ['node_modules/grunt-microlib/assets/loader.js', 'dist/aerogear.core.micro.js']
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-es6-module-transpiler');
     grunt.loadNpmTasks('grunt-microlib');
+    grunt.loadNpmTasks('grunt-concat-sourcemap');
     grunt.loadTasks('tasks');
     grunt.renameTask('browser', 'microlib');
 
-    grunt.registerTask('default', ['clean', 'transpile', 'microlib', 'microlibMap']);
+    grunt.registerTask('default', ['clean', 'transpile', 'microlib', 'microlibMap', 'concat_sourcemap']);
 
 };
