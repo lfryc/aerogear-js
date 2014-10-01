@@ -1,25 +1,12 @@
 <html>
 <head>
-    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.js"></script>
-    <!--<script type="application/javascript" src="build/aerogear.core.min.js"></script>-->
+    <script type="application/javascript" src="node_modules/grunt-microlib/assets/loader.js"></script>
+    <script type="application/javascript" src="dist/aerogear.core.micro.js"></script>
 </head>
 <body>
 
 
-<button onclick="">isArray</button>
-
-<script>
-
-    require.config({
-        paths: {
-            'aerogear.core': './build/aerogear.core.min'
-        }
-    });
-
-    require(['aerogear.core'], function( AeroGear ) {
-        console.log( AeroGear['default'].isArray([1, 2, 3]) );
-    });
-</script>
+<button onclick="console.log( AeroGear['default'].isArray([1, 2, 3]) )">isArray</button>
 
 </body>
 </html>
