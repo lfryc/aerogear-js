@@ -88,6 +88,7 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-es6-module-transpiler": "^0.6.0",
     "grunt-es6-transpiler": "^1.0.1",
+    "grunt-microlib": "^0.1.1",
     "grunt-shell": "0.3.1",
     "gulp": "^3.8.8",
     "gulp-es6-transpiler": "^1.0.0",
