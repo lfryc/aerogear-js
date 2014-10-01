@@ -1,14 +1,14 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
-  grunt.initConfig({
-      transpile: {
-          core: {}
-      }
-  });
+    grunt.initConfig({
+        transpile: {
+            core: {}
+        }
+    });
 
-  grunt.loadNpmTasks('grunt-es6-module-transpiler');
-  grunt.loadTasks('tasks');
+    grunt.loadNpmTasks('grunt-es6-module-transpiler');
+    grunt.loadTasks('tasks');
 
-  grunt.registerTask('default', ['transpile']);
+    grunt.registerTask('default', ['transpile']);
 
 };
