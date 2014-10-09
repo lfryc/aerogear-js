@@ -3,6 +3,10 @@ node_js:
   - '0.10'
 before_script:
   - npm install -g grunt-cli
+  - git clone -b AGJS-211-rework-integration-tests https://github.com/lfryc/aerogear-js-integration.git
+  - pushd aerogear-js-integration; npm install; popd
+script:
+  - grunt travis --verbose
 notifications:
   irc: "irc.freenode.org#aerogear"
 branches:
