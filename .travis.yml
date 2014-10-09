@@ -7,8 +7,3 @@ before_script:
   - pushd aerogear-js-integration; npm install; popd
 script:
   - grunt travis --verbose
-notifications:
-  irc: "irc.freenode.org#aerogear"
-branches:
-  only:
-    - master
