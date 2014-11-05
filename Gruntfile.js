@@ -26,6 +26,30 @@ module.exports = function (grunt) {
         },
         'multi-stage-sourcemap': {
             core: {}
+        },
+        uglify: {
+            core: {
+                options: {
+                    mangle: false,
+                    compress: false,
+                    beautify: true,
+                    preserveComments: true,
+                    sourceMap: true,
+                    banner: grunt.file.read('node_modules/grunt-microlib/assets/loader.js') + '\n(function(globals) {\n',
+                    footer: '\nwindow.AeroGear = requireModule("aerogear.core");\n})(window);'
+                },
+                files: {
+                    'dist/aerogear.core.ugly.js': ['dist/aerogear.core.amd.js']
+                }
+            }
+        },
+        copy: {
+            core: {
+                expand: true,
+                cwd: 'src/',
+                src: 'aerogear.core.js',
+                dest: 'dist/'
+            }
         }
     });
 
@@ -33,9 +57,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-es6-module-transpiler');
     grunt.loadNpmTasks('grunt-microlib');
     grunt.loadNpmTasks('grunt-concat-sourcemap');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadTasks('tasks');
     grunt.renameTask('browser', 'microlib');
 
-    grunt.registerTask('default', ['clean', 'transpile', 'microlib', 'microlibMap', 'concat_sourcemap']);
+    //grunt.registerTask('default', ['clean', 'transpile', 'microlib', 'microlibMap', 'concat_sourcemap']);
+    grunt.registerTask('default', ['clean', 'transpile', 'uglify', 'multi-stage-sourcemap', 'copy']);
 
 };

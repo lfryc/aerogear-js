@@ -1,11 +1,20 @@
 <html>
 <head>
-    <script type="application/javascript" src="dist/aerogear.core.concat.js"></script>
+    <!--<script src="bower_components/requirejs/require.js"></script>-->
+    <script type="application/javascript" src="dist/aerogear.core.ugly.js"></script>
 </head>
 <body>
 
 
-<button onclick="console.log( AeroGear['default'].isArray([1, 2, 3]) )">isArray</button>
+<button>isArray</button>
 
+<script>
+    var button = document.getElementsByTagName('button')[0];
+    button.onclick = function() {
+//        require(['aerogear.core'], function(AeroGear) {
+            AeroGear['default'].isArray([1, 2, 3]);
+//        });
+    }
+</script>
 </body>
 </html>

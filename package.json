@@ -77,6 +77,8 @@
   ],
   "keywords": [],
   "devDependencies": {
+    "es6-module-transpiler": "^0.9.3",
+    "es6-module-transpiler-amd-formatter": "^0.2.3",
     "express": "~3.3.5",
     "grunt": "~0.4.1",
     "grunt-cli": "~0.1.13",
@@ -84,6 +86,7 @@
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-concat": "~0.1.2",
     "grunt-contrib-connect": "0.3.0",
+    "grunt-contrib-copy": "^0.7.0",
     "grunt-contrib-jshint": "~0.1.1",
     "grunt-contrib-qunit": "~0.1.1",
     "grunt-contrib-uglify": "~0.1.2",
@@ -98,6 +101,7 @@
     "lodash": "~2.4.1",
     "multi-stage-sourcemap": "^0.2.1",
     "request": "~2.27.0",
+    "shelljs": "^0.3.0",
     "source-map": "^0.1.39"
   },
   "scripts": {
