@@ -66,6 +66,11 @@ module.exports = function(grunt) {
                     'external/crypto/sjcl.js'
                 ]
             },
+            testme: {
+                modules: [ 'test1', 'test2' ],
+                destination: [ 'dist/aerogear.custom.js' ],
+                externalSources: []
+            },
             core: {
                 modules: [ 'aerogear.core' ],
                 destination: [ 'dist/aerogear.custom.js' ],
@@ -240,6 +245,16 @@ module.exports = function(grunt) {
             report: {
                 options: { force: false }
             }
+        },
+        'correct-sourcemap': {
+            test1: {
+                from: 'dist/test1.js.map',
+                output: 'dist/test1.js.map'
+            },
+            test2: {
+                from: 'dist/test2.js.map',
+                output: 'dist/test2.js.map'
+            }
         }
     });
 
@@ -332,7 +347,7 @@ module.exports = function(grunt) {
         config.continueCompilation[target] = {};
 
         grunt.config.merge( config );
-        grunt.task.run(['transpile:' + target, 'continueCompilation:' + target]);
+        grunt.task.run(['transpile:' + target, 'correct-sourcemap', 'continueCompilation:' + target]);
     });
 
     grunt.registerMultiTask('continueCompilation', function() {
