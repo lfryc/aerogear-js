@@ -66,6 +66,11 @@ module.exports = function(grunt) {
                     'external/crypto/sjcl.js'
                 ]
             },
+            core: {
+                modules: [ 'aerogear.core' ],
+                destination: [ 'dist/aerogear.custom.js' ],
+                externalSources: []
+            },
             dataManager: {
                 modules: [ 'memory', 'session-local', 'indexeddb', 'websql' ],
                 destination: [ 'dist/aerogear.custom.js' ],
@@ -123,7 +128,7 @@ module.exports = function(grunt) {
             },
             oauth2: {
                 modules: [ 'oauth2' ],
-                destination: [ 'dist/oauth2' ],
+                destination: [ 'dist/aerogear.custom.js' ],
                 externalSources: [ 'external/uuid/uuid.js' ]
             }
         },
@@ -313,12 +318,11 @@ module.exports = function(grunt) {
             transpile: {
                 options: {
                     transitiveResolution: true,
+                    sourceRoot: '../',
                     resolvers: [ new ModuleResolver(new Transpiler.FileResolver( searchPath )) ]
                 }
             },
-            continueCompilation: {},
-            template: {},
-            concat_sourcemap: {}
+            continueCompilation: {}
         };
         config.transpile[target] = {
             formatter: 'amd',
@@ -337,7 +341,16 @@ module.exports = function(grunt) {
             transpileConfig = grunt.config('transpile'),
             config = {
                 template: {},
-                concat_sourcemap: {}
+                concat_sourcemap: {
+                    options: {
+                        //sourceRoot: process.cwd()
+                        sourcesContent: true,
+                        //process: function(src, filepath) {
+                        //    console.log(filepath);
+                        //    return src;
+                        //}
+                    }
+                }
             },
             compiledModules, modulesToLoad, filesToConcat, destination, externalSources;
 
