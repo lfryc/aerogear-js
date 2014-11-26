@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/test2.js"],"names":[],"mappings":";;;;;;;EAAA;GACC","sourcesContent":["console.log('abc');\nconsole.log('xyz');\nconsole.log('third line');"]}
